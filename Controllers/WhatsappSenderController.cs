@@ -25,13 +25,18 @@ public class WhatsappSenderController : ControllerBase
         return await SendMessagePrivate(phoneNumber, message);
     }
 
-    [HttpPost("MessageReceived")]
     public async Task<string> MessageReceived()
     {
         string body;
         using (StreamReader reader = new StreamReader(Request.Body))
         {
             body = await reader.ReadToEndAsync();
+        }
+        if (Request.Method == HttpMethod.Get.ToString())
+        {
+            await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "SE RECIBE SOLIICTUD DE PAIRING POR PARTE DE META: \n" + body);
+            var data = JsonConvert.DeserializeObject<WhatsappVerificationModel>(body);
+            return data.hub_challenge;
         }
         return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + body);
     }
