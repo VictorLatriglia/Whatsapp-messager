@@ -26,8 +26,11 @@ public class WhatsappSenderController : ControllerBase
     }
 
     [HttpGet("MessageReceived")]
-    public async Task<string> MessageReceived(string hub_mode, string hub_challenge, string hub_verify_token)
+    public async Task<string> Verification()
     {
+        string hub_mode = Request.Query["hub.mode"]; 
+        string hub_challenge = Request.Query["hub.challenge"]; 
+        string hub_verify_token = Request.Query["hub.verify.token"]; 
         await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), $"SE RECIBE SOLIICTUD DE PAIRING POR PARTE DE META: \n {hub_mode} \n {hub_challenge} \n {hub_verify_token}");
 
         return hub_challenge;
