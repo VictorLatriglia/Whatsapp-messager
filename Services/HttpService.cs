@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
 using RestSharp;
+using Whatsapp_bot.ServiceContracts;
+
+namespace Whatsapp_bot.Services;
 public class HttpService<TInput, TResult> : IHttpService<TInput, TResult>
 {
     public async Task<TResult> PostAsync(string url, TInput data, string token = "")

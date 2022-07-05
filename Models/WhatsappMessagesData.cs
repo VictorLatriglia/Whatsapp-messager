@@ -1,3 +1,4 @@
+namespace Whatsapp_bot.Models;
 public class WhatsappMessagesData
 {
     public string Object { get; set; }
