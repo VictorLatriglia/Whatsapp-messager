@@ -9,13 +9,13 @@ namespace Whatsapp_bot.Controllers;
 public class WhatsappSenderController : ControllerBase
 {
     private readonly ILogger<WhatsappSenderController> _logger;
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly IWhatsappMessageSenderService _whatsappMessageSenderService;
     public WhatsappSenderController(
         ILogger<WhatsappSenderController> logger,
-        IHttpClientFactory clientFactory)
+        IWhatsappMessageSenderService whatsappMessageSenderService)
     {
         _logger = logger;
-        _clientFactory = clientFactory;
+        _whatsappMessageSenderService = whatsappMessageSenderService;
     }
 
     [HttpPost("SendMessage")]
@@ -72,20 +72,6 @@ public class WhatsappSenderController : ControllerBase
 
     private async Task<string> SendMessagePrivate(string phoneNumber, string message)
     {
-        var json = new SendMessageModel(phoneNumber, message);
-
-        string jsonString = JsonConvert.SerializeObject(json);
-
-        var client = new RestClient("https://graph.facebook.com/v12.0/" + Environment.GetEnvironmentVariable("WHATSAPP_PHONE_ID") + "/messages");
-
-        var request = new RestRequest();
-        request.AddHeader("Content-Type", "application/json");
-        request.AddHeader("Authorization", "Bearer " + Environment.GetEnvironmentVariable("WHATSAPP_TOKEN"));
-
-        request.AddParameter("application/json", jsonString, ParameterType.RequestBody);
-        var response = await client.PostAsync(request);
-        Console.WriteLine(response.Content);
-
-        return response.Content;
+        return await _whatsappMessageSenderService.SendMessage(phoneNumber,message);;
     }
 }
