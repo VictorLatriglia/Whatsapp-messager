@@ -16,7 +16,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7060;http://localhost:5105",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "WHATSAPP_BASE_URL":"https://graph.facebook.com/v12.0/{PHONE_ID}/messages",
+        "WHATSAPP_PHONE_ID":"108095001915602",
+        "WHATSAPP_PHONE_NUMBER":"573178693786",
+        "WHATSAPP_TOKEN":"EAAGGrPYnm88BAESJvhZAaYuhXsqhlU54eBd6d0hwP3krQMRrSW9FQTFpREt7bz2En1uzX7Hvcy1ZBKTx2XYw68AbxZCR0aLW6W4FMpYHvzKfLZCiSb7ZAP3rfbqzT9h7sYBcKNUTXc70qEAobEilCIEzB8MZBzrvmoZC89uBbZClhsxeb4i1ZBoEBaHLhbJwXZAZAuojNvnZBeyeCAZDZD"
       }
     },
     "IIS Express": {

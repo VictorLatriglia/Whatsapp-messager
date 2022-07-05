@@ -43,6 +43,7 @@ public class WhatsappSenderController : ControllerBase
         {
             body = await reader.ReadToEndAsync();
         }
+        await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "MOSTRANDO BODY PARA DEPURAR: \n" + body+"\n\n");
         try
         {
             var data = JsonConvert.DeserializeObject<WhatsappMessagesData>(body);
@@ -61,11 +62,12 @@ public class WhatsappSenderController : ControllerBase
             if (message.text.body == null) throw new Exception("Not recognized");
 
 
-            return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + body);
+            return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + message.text.body);
 
         }
         catch (Exception ex)
         {
+            await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + body+"\n\n"+ex.ToString());
             throw new Exception(body + " ===== " + ex.ToString());
         }
     }
