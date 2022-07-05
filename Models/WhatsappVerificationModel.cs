@@ -1,3 +1,4 @@
+namespace Whatsapp_bot.Models;
 public class WhatsappVerificationModel
 {
     public string hub_mode { get; set; }

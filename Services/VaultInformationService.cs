@@ -1,3 +1,6 @@
+using Whatsapp_bot.ServiceContracts;
+
+namespace Whatsapp_bot.Services;
 public class VaultInformationService : IVaultInformationService
 {
     public string GetParameter(string key)

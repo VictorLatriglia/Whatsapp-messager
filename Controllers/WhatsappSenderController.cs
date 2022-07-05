@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
-using RestSharp;
+using Whatsapp_bot.Models;
+using Whatsapp_bot.ServiceContracts;
 
 namespace Whatsapp_bot.Controllers;
 
@@ -8,13 +9,10 @@ namespace Whatsapp_bot.Controllers;
 [Route("[controller]")]
 public class WhatsappSenderController : ControllerBase
 {
-    private readonly ILogger<WhatsappSenderController> _logger;
     private readonly IWhatsappMessageSenderService _whatsappMessageSenderService;
     public WhatsappSenderController(
-        ILogger<WhatsappSenderController> logger,
         IWhatsappMessageSenderService whatsappMessageSenderService)
     {
-        _logger = logger;
         _whatsappMessageSenderService = whatsappMessageSenderService;
     }
 
@@ -25,54 +23,36 @@ public class WhatsappSenderController : ControllerBase
     }
 
     [HttpGet("MessageReceived")]
-    public async Task<string> Verification()
+    public string Verification()
     {
-        string hub_mode = Request.Query["hub.mode"];
         string hub_challenge = Request.Query["hub.challenge"];
-        string hub_verify_token = Request.Query["hub.verify.token"];
-        await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), $"SE RECIBE SOLIICTUD DE PAIRING POR PARTE DE META: \n {hub_mode} \n {hub_challenge} \n {hub_verify_token}");
-
         return hub_challenge;
     }
 
     [HttpPost("MessageReceived")]
-    public async Task<string> MessageReceived()
+    public async Task<string> MessageReceived(WhatsappMessagesData data)
     {
-        string body;
-        using (StreamReader reader = new StreamReader(Request.Body))
-        {
-            body = await reader.ReadToEndAsync();
-        }
-        
         try
         {
-            var data = JsonConvert.DeserializeObject<WhatsappMessagesData>(body);
-            if (data == null) throw new Exception("Not recognized");
-            if (data.Entry == null) throw new Exception("Not recognized");
-            if (data.Entry[0] == null) throw new Exception("Not recognized");
-            var firstEntry = data.Entry[0];
-            if (firstEntry.Changes == null) throw new Exception("Not recognized");
-            if (firstEntry.Changes[0] == null) throw new Exception("Not recognized");
-            var firstChange = firstEntry.Changes[0];
-            if (firstChange.Value == null) throw new Exception("Not recognized");
-            if (firstChange.Value.Messages == null) throw new Exception("Not recognized");
-            if (firstChange.Value.Messages[0] == null) throw new Exception("Not recognized");
-            var message = firstChange.Value.Messages[0];
-            if (message.text == null) throw new Exception("Not recognized");
-            if (message.text.body == null) throw new Exception("Not recognized");
 
+            var firstEntry = data?.Entry[0];
 
-            return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + message.text.body);
+            var firstChange = firstEntry?.Changes[0];
+
+            var message = firstChange?.Value.Messages[0];
+
+            return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER") ?? "",
+            "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + message?.text.body ?? "NO DATA RECONOCIDA");
 
         }
-        catch (Exception ex)
+        catch
         {
-            throw new Exception(body + " ===== " + ex.ToString());
+            throw;
         }
     }
 
     private async Task<string> SendMessagePrivate(string phoneNumber, string message)
     {
-        return await _whatsappMessageSenderService.SendMessage(phoneNumber,message);;
+        return await _whatsappMessageSenderService.SendMessage(phoneNumber, message);
     }
 }

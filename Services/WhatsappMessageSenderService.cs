@@ -1,3 +1,8 @@
+using Whatsapp_bot.Models;
+using Whatsapp_bot.ServiceContracts;
+using Whatsapp_bot.Utils;
+
+namespace Whatsapp_bot.Services;
 public class WhatsappMessageSenderService : IWhatsappMessageSenderService
 {
     private readonly IHttpService<SendMessageModel, string> HttpService;
