@@ -10,9 +10,9 @@ public class LoggerService : ILoggerService
     {
         LogRepository = logRepository;
     }
-    public async Task SaveLog(string logData, bool withErrors, ActionType action)
+    public async Task<Log> SaveLog(string logData, bool withErrors, ActionType action)
     {
         Log entity = Log.Build(logData, withErrors, action);
-        await LogRepository.AddAsync(entity);
+        return await LogRepository.AddAsync(entity);
     }
 }

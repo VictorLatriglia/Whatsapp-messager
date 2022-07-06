@@ -9,14 +9,17 @@ using Moq;
 public class LoggerServiceTests
 {
     [Fact]
-    public void TestName()
+    public async Task SaveLog_Success()
     {
         // Given
-        //Moq<IRepository<Log>> moq = new Moq<IRepository<Log>>();
-        //LoggerService service = new LoggerService(moq.Object);
+        Mock<IRepository<Log>> moq = new Mock<IRepository<Log>>();
+        moq.Setup(x => x.AddAsync(It.IsAny<Log>())).Returns(Task.FromResult(new Log()));
+        LoggerService service = new LoggerService(moq.Object);
 
         // When
-    
+        var res = await service.SaveLog("From Unit test", false, ActionType.InternalProcess);
+        
         // Then
+        Assert.NotEqual("", res.Id);
     }
 }
