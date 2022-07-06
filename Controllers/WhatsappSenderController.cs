@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
 using Whatsapp_bot.Models;
 using Whatsapp_bot.ServiceContracts;
+using Whatsapp_bot.Models.EntityModels;
 
 namespace Whatsapp_bot.Controllers;
 
@@ -10,10 +11,13 @@ namespace Whatsapp_bot.Controllers;
 public class WhatsappSenderController : ControllerBase
 {
     private readonly IWhatsappMessageSenderService _whatsappMessageSenderService;
+    private readonly ILoggerService _loggerService;
     public WhatsappSenderController(
-        IWhatsappMessageSenderService whatsappMessageSenderService)
+        IWhatsappMessageSenderService whatsappMessageSenderService,
+        ILoggerService loggerService)
     {
         _whatsappMessageSenderService = whatsappMessageSenderService;
+        _loggerService = loggerService;
     }
 
     [HttpPost("SendMessage")]
@@ -35,18 +39,19 @@ public class WhatsappSenderController : ControllerBase
         try
         {
 
-            var firstEntry = data?.Entry[0];
+            var firstEntry = data.Entry[0];
 
-            var firstChange = firstEntry?.Changes[0];
+            var firstChange = firstEntry.Changes[0];
 
-            var message = firstChange?.Value.Messages[0];
+            var message = firstChange.Value.Messages[0];
 
             return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER") ?? "",
             "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + message?.text.body ?? "NO DATA RECONOCIDA");
 
         }
-        catch
+        catch (Exception ex)
         {
+            await _loggerService.SaveLog(ex.ToString(), true, ActionType.MessageReceived);
             throw;
         }
     }
