@@ -351,3 +351,9 @@ MigrationBackup/
 .vscode/
 
 .sonarqube/
+
+SonarRun.bat
+
+WebAPI/Properties
+
+WebAPI/Coverage.xml
