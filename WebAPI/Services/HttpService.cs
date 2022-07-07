@@ -7,7 +7,17 @@ public class HttpService<TInput, TResult> : IHttpService<TInput, TResult>
 {
     public async Task<TResult> PostAsync(string url, TInput data, string token = "")
     {
+        if (data is null)
+        {
+            throw new ArgumentNullException("Null data");
+        }
+
         string jsonString = JsonConvert.SerializeObject(data);
+
+        if (string.IsNullOrEmpty(jsonString))
+        {
+            throw new ArgumentNullException("Null data");
+        }
 
         var client = new RestClient(url);
 
@@ -16,6 +26,7 @@ public class HttpService<TInput, TResult> : IHttpService<TInput, TResult>
         request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddParameter("application/json", jsonString, ParameterType.RequestBody);
+        
         var response = await client.PostAsync(request);
 
         if (response?.Content == null)
