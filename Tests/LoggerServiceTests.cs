@@ -3,8 +3,6 @@ namespace Tests;
 using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.Models.EntityModels;
 using Whatsapp_bot.Services;
-using Xunit;
-using Moq;
 
 public class LoggerServiceTests
 {

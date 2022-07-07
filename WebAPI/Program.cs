@@ -22,7 +22,7 @@ sealed class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddEntityFrameworkSqlite().AddDbContext<ApplicationDbContext>();
+        builder.Services.AddSqlite<ApplicationDbContext>("Filename=MyDatabase.db");
 
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped(typeof(IHttpService<,>), typeof(HttpService<,>));

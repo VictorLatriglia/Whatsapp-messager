@@ -4,12 +4,12 @@ using Whatsapp_bot.DataAccess.Context;
 namespace Whatsapp_bot.DataAccess.Repository;
 public class Repository<T> : IRepository<T> where T : class
 {
-    private readonly ApplicationDbContext Context;
+    private readonly DbContext Context;
     private readonly  DbSet<T> DataSet;
-    public Repository()
+    public Repository(DbContext context)
     {
-        Context = new ApplicationDbContext();
-        DataSet = Context.Set<T>();
+        Context = context;
+        DataSet = context.Set<T>();
     }
 
     public async Task<T> AddAsync(T entity)
