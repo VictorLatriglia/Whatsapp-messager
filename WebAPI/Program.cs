@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Whatsapp_bot.DataAccess.Context;
 using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.ServiceContracts;
@@ -23,7 +24,7 @@ sealed class Program
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddSqlite<ApplicationDbContext>("Filename=MyDatabase.db");
-
+        builder.Services.AddScoped<DbContext, ApplicationDbContext>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped(typeof(IHttpService<,>), typeof(HttpService<,>));
         builder.Services.AddTransient<ILoggerService, LoggerService>();
