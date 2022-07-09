@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Whatsapp_bot.DataAccess.Context;
 using Whatsapp_bot.DataAccess.Repository;
@@ -19,6 +20,12 @@ sealed class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
+
+        builder.Services.Configure<ApiBehaviorOptions>(o =>
+        {
+            o.InvalidModelStateResponseFactory = actionContext =>
+                new OkObjectResult(actionContext.ModelState);
+        });
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
