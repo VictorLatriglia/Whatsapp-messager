@@ -21,16 +21,19 @@ sealed class Program
 
         // Add services to the container.
 
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
         builder.Services.Configure<ApiBehaviorOptions>(o =>
         {
             o.InvalidModelStateResponseFactory = actionContext =>
-                new OkObjectResult(actionContext.ModelState);
+                {
+                    actionContext.HttpContext.Response.StatusCode = StatusCodes.Status200OK;
+                    return new OkObjectResult(actionContext.ModelState);
+                };
         });
 
-        builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
 
         builder.Services.AddScoped<MetaControlledResponseFilter>();
         builder.Services.AddSqlite<ApplicationDbContext>("Filename=MyDatabase.db");
