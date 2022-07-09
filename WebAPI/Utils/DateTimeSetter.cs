@@ -8,7 +8,7 @@ public struct ManagedDateTime
         {
             if (now == default)
             {
-                now = DateTime.Now;
+                now = DateTime.UtcNow;
             }
             return now.AddHours(-5);
         }
