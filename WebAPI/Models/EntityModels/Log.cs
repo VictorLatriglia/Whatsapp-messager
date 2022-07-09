@@ -1,4 +1,7 @@
 namespace Whatsapp_bot.Models.EntityModels;
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class Log : EntityBase
 {
     public string LogData { get; set; }

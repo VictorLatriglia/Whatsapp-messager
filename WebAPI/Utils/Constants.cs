@@ -1,4 +1,7 @@
 namespace Whatsapp_bot.Utils;
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public static class Globals
 {
     public const string WHATSAPP_BASE_URL = nameof(WHATSAPP_BASE_URL);

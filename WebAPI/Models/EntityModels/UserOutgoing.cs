@@ -1,4 +1,7 @@
 namespace Whatsapp_bot.Models.EntityModels;
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class UserOutgoing : EntityBase
 {
     public double Ammount { get; set; }

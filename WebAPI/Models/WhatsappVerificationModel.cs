@@ -1,4 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Whatsapp_bot.Models;
+[ExcludeFromCodeCoverage]
 public class WhatsappVerificationModel
 {
     public string hub_mode { get; set; }
