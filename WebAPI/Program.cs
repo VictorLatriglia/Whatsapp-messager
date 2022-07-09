@@ -9,8 +9,9 @@ namespace Whatsapp_bot;
 [ExcludeFromCodeCoverage]
 sealed class Program
 {
-    private Program(){
-            
+    private Program()
+    {
+
     }
     private static void Main(string[] args)
     {
@@ -29,6 +30,7 @@ sealed class Program
         builder.Services.AddScoped(typeof(IHttpService<,>), typeof(HttpService<,>));
         builder.Services.AddTransient<ILoggerService, LoggerService>();
         builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
+        builder.Services.AddTransient<IUserInformationService, UserInformationService>();
         builder.Services.AddTransient<IWhatsappMessageSenderService, WhatsappMessageSenderService>();
 
         var app = builder.Build();

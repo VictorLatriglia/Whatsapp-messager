@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
 using Whatsapp_bot.Models;
 using Whatsapp_bot.ServiceContracts;
@@ -12,12 +11,15 @@ public class WhatsappSenderController : ControllerBase
 {
     private readonly IWhatsappMessageSenderService _whatsappMessageSenderService;
     private readonly ILoggerService _loggerService;
+    private readonly IUserInformationService _userService;
     public WhatsappSenderController(
         IWhatsappMessageSenderService whatsappMessageSenderService,
-        ILoggerService loggerService)
+        ILoggerService loggerService,
+        IUserInformationService userService)
     {
         _whatsappMessageSenderService = whatsappMessageSenderService;
         _loggerService = loggerService;
+        _userService = userService;
     }
 
     [HttpPost("SendMessage")]
@@ -38,16 +40,28 @@ public class WhatsappSenderController : ControllerBase
     {
         try
         {
-
             var firstEntry = data.Entry[0];
 
             var firstChange = firstEntry.Changes[0];
 
             var message = firstChange.Value.Messages[0];
 
-            return await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER") ?? "",
-            "EL SIGUIENTE ES EL BODY RECIBIDO: \n" + message?.text.body ?? "NO DATA RECONOCIDA");
-
+            var userPhone = message.From;
+            var text = message.text.body;
+            var recognicedParts = text.Split(' ');
+            if (recognicedParts != null && recognicedParts.Length == 3)
+            {
+                var result = _userService.AddOutgoing(Convert.ToDouble(recognicedParts[2]), recognicedParts[1], recognicedParts[0], userPhone);
+                await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
+                return await SendMessagePrivate(userPhone,
+                    $"Gracias! hemos registrado tu gasto de ${recognicedParts[2]} en {recognicedParts[1]}");
+            }
+            else
+            {
+                await _loggerService.SaveLog("No se pudo añadir el gasto, la data no estuvo en el formato correcto", true, ActionType.MessageReceived);
+                return await SendMessagePrivate(userPhone,
+                    "Lo sentimos, no registraste el dato de manera correcta. \nRecuerda que debe ser en formato:\nCategoría Etiqueta Valor\nPor ejemplo:\nAlimentos café 5500");
+            }
         }
         catch (Exception ex)
         {

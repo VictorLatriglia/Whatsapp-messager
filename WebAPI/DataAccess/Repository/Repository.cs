@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Whatsapp_bot.DataAccess.Context;
 
@@ -5,7 +6,7 @@ namespace Whatsapp_bot.DataAccess.Repository;
 public class Repository<T> : IRepository<T> where T : class
 {
     private readonly DbContext Context;
-    private readonly  DbSet<T> DataSet;
+    private readonly DbSet<T> DataSet;
     public Repository(DbContext context)
     {
         Context = context;
@@ -28,5 +29,15 @@ public class Repository<T> : IRepository<T> where T : class
     {
         DataSet.Remove(entity);
         await Context.SaveChangesAsync();
+    }
+
+    public async Task<T> GetAsync(Expression<Func<T, bool>> query)
+    {
+        return await DataSet.FirstOrDefaultAsync(query);
+    }
+
+    public async Task<List<T>> QueryAsync(Expression<Func<T, bool>> query)
+    {
+        return await DataSet.Where(query).ToListAsync();
     }
 }
