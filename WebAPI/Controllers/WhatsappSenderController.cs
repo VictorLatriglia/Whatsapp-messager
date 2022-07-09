@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Whatsapp_bot.Models;
 using Whatsapp_bot.ServiceContracts;
 using Whatsapp_bot.Models.EntityModels;
+using Whatsapp_bot.Utils.Middleware;
 
 namespace Whatsapp_bot.Controllers;
 
@@ -36,6 +37,8 @@ public class WhatsappSenderController : ControllerBase
     }
 
     [HttpPost("MessageReceived")]
+    [ServiceFilter(typeof(MetaControlledResponseFilter))]
+    [TypeFilter(typeof(MetaExceptionFilter))]
     public async Task<string> MessageReceived(WhatsappMessagesData data)
     {
         try

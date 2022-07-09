@@ -4,6 +4,7 @@ using Whatsapp_bot.DataAccess.Context;
 using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.ServiceContracts;
 using Whatsapp_bot.Services;
+using Whatsapp_bot.Utils.Middleware;
 
 namespace Whatsapp_bot;
 [ExcludeFromCodeCoverage]
@@ -24,6 +25,7 @@ sealed class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        builder.Services.AddScoped<MetaControlledResponseFilter>();
         builder.Services.AddSqlite<ApplicationDbContext>("Filename=MyDatabase.db");
         builder.Services.AddScoped<DbContext, ApplicationDbContext>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

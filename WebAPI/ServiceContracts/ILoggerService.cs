@@ -4,4 +4,5 @@ namespace Whatsapp_bot.ServiceContracts;
 public interface ILoggerService
 {
     Task<Log> SaveLog(string logData, bool withErrors, ActionType action);
+    Task<IList<Log>> GetAll();
 }

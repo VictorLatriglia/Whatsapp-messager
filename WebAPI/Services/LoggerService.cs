@@ -10,6 +10,10 @@ public class LoggerService : ILoggerService
     {
         LogRepository = logRepository;
     }
+
+    public async Task<IList<Log>> GetAll() =>
+        await LogRepository.GetAllAsync();
+
     public async Task<Log> SaveLog(string logData, bool withErrors, ActionType action)
     {
         Log entity = Log.Build(logData, withErrors, action);

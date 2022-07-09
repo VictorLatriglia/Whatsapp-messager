@@ -357,3 +357,5 @@ SonarRun.bat
 WebAPI/Properties
 
 WebAPI/Coverage.xml
+
+WebAPI/MyDatabase.db
