@@ -41,6 +41,32 @@ public class RepositoryTests
     }
 
     [Fact]
+    public async Task GetOne_Success()
+    {
+        // Given
+        Repository<Log> repo = new Repository<Log>(Context);
+
+        // When
+        var log = await repo.AddAsync(Log.Build("TEST", false, ActionType.InternalProcess));
+        var savedLog = await repo.GetAsync(x => x.Id.Equals(log.Id));
+        // Then
+        Assert.NotNull(savedLog);
+    }
+
+    [Fact]
+    public async Task GetQueried_Success()
+    {
+        // Given
+        Repository<Log> repo = new Repository<Log>(Context);
+
+        // When
+        var log = await repo.AddAsync(Log.Build("TEST", false, ActionType.InternalProcess));
+        var logs = await repo.QueryAsync(x => x.Id.Equals(log.Id));
+        // Then
+        Assert.Contains(log, logs.ToList());
+    }
+
+    [Fact]
     public async Task Delete_Success()
     {
         // Given

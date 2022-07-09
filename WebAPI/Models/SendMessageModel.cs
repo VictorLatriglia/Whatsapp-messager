@@ -1,4 +1,7 @@
 namespace Whatsapp_bot.Models;
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class SendMessageModel
 {
     public readonly string messaging_product = "whatsapp";
