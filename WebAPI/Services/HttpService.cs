@@ -26,16 +26,20 @@ public class HttpService<TInput, TResult> : IHttpService<TInput, TResult>
         request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddParameter("application/json", jsonString, ParameterType.RequestBody);
-        
-        var response = await client.PostAsync(request);
-
-        if (response?.Content == null)
-            throw new Exception($"Request failed  {response?.ErrorMessage}  {response?.StatusCode}");
-
-        if (typeof(TResult).Equals(typeof(string)))
+        try
         {
-            return (TResult)Convert.ChangeType(response.Content, typeof(TResult));
+            var response = await client.PostAsync(request);
+
+            if (typeof(TResult).Equals(typeof(string)))
+            {
+                return (TResult)Convert.ChangeType(response.Content, typeof(TResult));
+            }
+            return JsonConvert.DeserializeObject<TResult>(response.Content);
+
         }
-        return JsonConvert.DeserializeObject<TResult>(response.Content);
+        catch (Exception ex)
+        {
+            throw ex;
+        }
     }
 }

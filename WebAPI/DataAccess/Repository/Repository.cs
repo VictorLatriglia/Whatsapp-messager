@@ -40,4 +40,9 @@ public class Repository<T> : IRepository<T> where T : class
     {
         return await DataSet.Where(query).ToListAsync();
     }
+
+    public IQueryable<T> AsQueryable()
+    {
+        return DataSet.AsQueryable();
+    }
 }
