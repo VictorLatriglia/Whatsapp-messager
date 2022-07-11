@@ -33,8 +33,6 @@ public class UserInformationServiceTests
         Mock<IRepository<UserOutgoing>> userOutgoingRepoMock = new Mock<IRepository<UserOutgoing>>();
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
         Mock<IRepository<OutgoingsTag>> tagsRepoMock = new Mock<IRepository<OutgoingsTag>>();
-        userRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<User, bool>>>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         categoriesRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsCategory, bool>>>()))
             .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString() }));
         tagsRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsTag, bool>>>()))
@@ -44,7 +42,7 @@ public class UserInformationServiceTests
 
         UserInformationService userService = new UserInformationService(userRepoMock.Object, userOutgoingRepoMock.Object, categoriesRepoMock.Object, tagsRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", "1234567890");
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
         // Then
         Assert.NotEqual("", res.Id);
     }
@@ -57,8 +55,6 @@ public class UserInformationServiceTests
         Mock<IRepository<UserOutgoing>> userOutgoingRepoMock = new Mock<IRepository<UserOutgoing>>();
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
         Mock<IRepository<OutgoingsTag>> tagsRepoMock = new Mock<IRepository<OutgoingsTag>>();
-        userRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<User, bool>>>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         categoriesRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsCategory, bool>>>()))
             .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString() }));
         tagsRepoMock.Setup(x => x.AddAsync(It.IsAny<OutgoingsTag>()))
@@ -67,7 +63,7 @@ public class UserInformationServiceTests
                 .Returns(Task.FromResult(new UserOutgoing { Id = Guid.NewGuid().ToString() }));
         UserInformationService userService = new UserInformationService(userRepoMock.Object, userOutgoingRepoMock.Object, categoriesRepoMock.Object, tagsRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", "1234567890");
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
         // Then
         Assert.NotEqual("", res.Id);
     }
@@ -80,8 +76,6 @@ public class UserInformationServiceTests
         Mock<IRepository<UserOutgoing>> userOutgoingRepoMock = new Mock<IRepository<UserOutgoing>>();
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
         Mock<IRepository<OutgoingsTag>> tagsRepoMock = new Mock<IRepository<OutgoingsTag>>();
-        userRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<User, bool>>>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         categoriesRepoMock.Setup(x => x.AddAsync(It.IsAny<OutgoingsCategory>()))
             .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString() }));
         tagsRepoMock.Setup(x => x.AddAsync(It.IsAny<OutgoingsTag>()))
@@ -90,7 +84,7 @@ public class UserInformationServiceTests
                 .Returns(Task.FromResult(new UserOutgoing { Id = Guid.NewGuid().ToString() }));
         UserInformationService userService = new UserInformationService(userRepoMock.Object, userOutgoingRepoMock.Object, categoriesRepoMock.Object, tagsRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", "1234567890");
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
         // Then
         Assert.NotEqual("", res.Id);
     }

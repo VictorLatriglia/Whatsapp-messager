@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.Models.EntityModels;
 using Whatsapp_bot.ServiceContracts;
@@ -21,7 +22,7 @@ public class UserInformationService : IUserInformationService
         _categoriesRepo = categoriesRepo;
         _tagsRepo = tagsRepo;
     }
-    public async Task<UserOutgoing> AddOutgoing(double ammount, string tag, string category, string userPhone)
+    public async Task<UserOutgoing> AddOutgoing(double ammount, string tag, string category, User user)
     {
         var savedTag = await _tagsRepo.GetAsync(x => x.Name.Equals(tag.ToUpper()));
         var savedCategory = await _categoriesRepo.GetAsync(x => x.Name.Equals(category.ToUpper()));
@@ -34,12 +35,24 @@ public class UserInformationService : IUserInformationService
         {
             savedTag = await _tagsRepo.AddAsync(OutgoingsTag.Build(tag, savedCategory.Id));
         }
-        var user = await _userRepo.GetAsync(x => x.PhoneNumber.Equals(userPhone));
         return await _userOutgoingRepo.AddAsync(UserOutgoing.Build(ammount, savedTag.Id, user.Id));
+    }
+
+    public async Task<List<UserOutgoing>> GetOutgoingsSummary(User user)
+    {
+        var userOutgoings = await _userOutgoingRepo.AsQueryable()
+            .Include(x => x.Tag).ThenInclude(x => x.OutgoingsCategory)
+            .Where(x => x.UserId.Equals(user.Id))
+            .ToListAsync();
+        return userOutgoings;
     }
 
     public async Task<User> AddUser(string name, string userPhone)
     {
         return await _userRepo.AddAsync(User.Build(name, userPhone));
+    }
+    public async Task<User> GetUserAsync(string userPhone)
+    {
+        return await _userRepo.GetAsync(x => x.PhoneNumber.Equals(userPhone));
     }
 }
