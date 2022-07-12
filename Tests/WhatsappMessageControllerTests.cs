@@ -6,18 +6,31 @@ using Whatsapp_bot.ServiceContracts;
 namespace Tests;
 public class WhatsappMessageControllerTests
 {
+    Mock<IWhatsappMessageSenderService> _messageSenderMock;
+    Mock<ILoggerService> _loggerServiceMock;
+    Mock<IUserInformationService> _userServiceMock;
+    Mock<ISpeechRecognitionService> _speechServiceMock;
+
+    public WhatsappMessageControllerTests()
+    {
+        _messageSenderMock = new Mock<IWhatsappMessageSenderService>();
+        _loggerServiceMock = new Mock<ILoggerService>();
+        _userServiceMock = new Mock<IUserInformationService>();
+        _speechServiceMock = new Mock<ISpeechRecognitionService>();
+    }
+
     [Fact]
     public async Task SendMessage_Success()
     {
         // Given
-        Mock<IWhatsappMessageSenderService> messageSenderMock = new Mock<IWhatsappMessageSenderService>();
-        Mock<ILoggerService> loggerServiceMock = new Mock<ILoggerService>();
-        Mock<IUserInformationService> userServiceMock = new Mock<IUserInformationService>();
-
-        messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
-        WhatsappSenderController controller = new WhatsappSenderController(messageSenderMock.Object, loggerServiceMock.Object, userServiceMock.Object);
+        WhatsappSenderController controller = new WhatsappSenderController(
+            _messageSenderMock.Object,
+            _loggerServiceMock.Object,
+            _userServiceMock.Object,
+            _speechServiceMock.Object);
         // When
         var res = await controller.SendMessage("This is a test", "12345");
 
@@ -29,11 +42,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_Success()
     {
         // Given
-        Mock<IWhatsappMessageSenderService> messageSenderMock = new Mock<IWhatsappMessageSenderService>();
-        Mock<ILoggerService> loggerServiceMock = new Mock<ILoggerService>();
-        Mock<IUserInformationService> userServiceMock = new Mock<IUserInformationService>();
-
-        messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
         WhatsappMessagesData data = new WhatsappMessagesData
@@ -77,7 +86,11 @@ public class WhatsappMessageControllerTests
             }
         };
 
-        WhatsappSenderController controller = new WhatsappSenderController(messageSenderMock.Object, loggerServiceMock.Object, userServiceMock.Object);
+        WhatsappSenderController controller = new WhatsappSenderController(
+            _messageSenderMock.Object, 
+            _loggerServiceMock.Object, 
+            _userServiceMock.Object,
+            _speechServiceMock.Object);
         // When
         var res = await controller.MessageReceived(data);
 
@@ -89,14 +102,10 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_Failure()
     {
         // Given
-        Mock<IWhatsappMessageSenderService> messageSenderMock = new Mock<IWhatsappMessageSenderService>();
-        Mock<ILoggerService> loggerServiceMock = new Mock<ILoggerService>();
-        Mock<IUserInformationService> userServiceMock = new Mock<IUserInformationService>();
-
-        loggerServiceMock.Setup(x => x.SaveLog(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<ActionType>()))
+        _loggerServiceMock.Setup(x => x.SaveLog(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<ActionType>()))
             .Returns(Task.FromResult(Log.Build("This is a test", true, ActionType.InternalProcess)));
 
-        messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
         //Object left incomplete on purpose
@@ -111,7 +120,11 @@ public class WhatsappMessageControllerTests
             }
         };
 
-        WhatsappSenderController controller = new WhatsappSenderController(messageSenderMock.Object, loggerServiceMock.Object, userServiceMock.Object);
+        WhatsappSenderController controller = new WhatsappSenderController(
+            _messageSenderMock.Object, 
+            _loggerServiceMock.Object, 
+            _userServiceMock.Object,
+            _speechServiceMock.Object);
         // When
         await Assert.ThrowsAsync(typeof(NullReferenceException), async () =>
         {

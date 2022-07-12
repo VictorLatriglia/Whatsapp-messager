@@ -8,7 +8,6 @@ using Whatsapp_bot.ServiceContracts;
 public class LogsController : ControllerBase
 {
     readonly ILoggerService _loggerService;
-
     public LogsController(ILoggerService loggerService)
     {
         _loggerService = loggerService;

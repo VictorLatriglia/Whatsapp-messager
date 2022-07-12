@@ -14,14 +14,17 @@ public class WhatsappSenderController : ControllerBase
     private readonly IWhatsappMessageSenderService _whatsappMessageSenderService;
     private readonly ILoggerService _loggerService;
     private readonly IUserInformationService _userService;
+    private readonly ISpeechRecognitionService _speechRecognitionService;
     public WhatsappSenderController(
         IWhatsappMessageSenderService whatsappMessageSenderService,
         ILoggerService loggerService,
-        IUserInformationService userService)
+        IUserInformationService userService,
+        ISpeechRecognitionService speechRecognitionService)
     {
         _whatsappMessageSenderService = whatsappMessageSenderService;
         _loggerService = loggerService;
         _userService = userService;
+        _speechRecognitionService = speechRecognitionService;
     }
 
     [HttpPost("SendMessage")]
@@ -59,7 +62,8 @@ public class WhatsappSenderController : ControllerBase
                 return await SendMessagePrivate(userPhone,
                 "Lo sentimos, no estás registrado en la plataforma todavía");
             }
-            if (text.ToLower().Contains("resumen"))
+
+            if (_speechRecognitionService.UserRequestOutgoingsSummary(text.ToLower()))
             {
                 var outgoings = await _userService.GetOutgoingsSummary(user);
                 return await SendMessagePrivate(userPhone,

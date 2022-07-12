@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Whatsapp_bot.Services;
 
 namespace Tests;
@@ -8,7 +9,9 @@ public class VaultServiceTests
     {
         // Given
         Environment.SetEnvironmentVariable("TEST", "TEST");
-        VaultInformationService vaultService = new VaultInformationService();
+        IConfigurationBuilder config = new ConfigurationBuilder();
+        
+        VaultInformationService vaultService = new VaultInformationService(config.Build());
 
         // When
         var res = vaultService.GetParameter("TEST");
@@ -21,7 +24,9 @@ public class VaultServiceTests
     public void GetParameter_Failure()
     {
         // Given
-        VaultInformationService vaultService = new VaultInformationService();
+        IConfigurationBuilder config = new ConfigurationBuilder();
+        
+        VaultInformationService vaultService = new VaultInformationService(config.Build());
 
         // When
         Assert.Throws(typeof(ArgumentNullException), 
