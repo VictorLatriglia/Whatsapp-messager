@@ -6,6 +6,7 @@ using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.ServiceContracts;
 using Whatsapp_bot.Services;
 using Whatsapp_bot.Utils.Middleware;
+using Microsoft.Extensions.Configuration;
 
 namespace Whatsapp_bot;
 [ExcludeFromCodeCoverage]
@@ -20,7 +21,9 @@ sealed class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
+        builder.Configuration.AddJsonFile("./SpeechDictionary/Spanish/SummaryRequests.json");
+        builder.Configuration.AddJsonFile("./SpeechDictionary/Spanish/Numbers.json");
+        builder.Configuration.AddJsonFile("./SpeechDictionary/Spanish/Affirmations.json");
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -44,6 +47,7 @@ sealed class Program
         builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
         builder.Services.AddTransient<IUserInformationService, UserInformationService>();
         builder.Services.AddTransient<IWhatsappMessageSenderService, WhatsappMessageSenderService>();
+        builder.Services.AddTransient<ISpeechRecognitionService, SpeechRecognitionService>();
 
         var app = builder.Build();
 
