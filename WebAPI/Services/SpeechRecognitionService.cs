@@ -9,14 +9,19 @@ public class SpeechRecognitionService : ISpeechRecognitionService
     {
         _vaultService = vaultService;
     }
-    public bool TextContainsNumbers(string text)
+    public bool TextContainsNumbers(string text, out List<string> IdentifiedNumbers)
     {
-        throw new NotImplementedException();
+        List<string> TextParts = text.Split(' ').ToList();
+        var Numbers = _vaultService.GetUserKeyWords(SpeechType.Numbers);
+        IdentifiedNumbers = TextParts.Intersect(Numbers).ToList();
+        return IdentifiedNumbers.Count > 0;
     }
 
     public bool UserGivesConfirmation(string text)
     {
-        throw new NotImplementedException();
+        var words = _vaultService.GetUserKeyWords(SpeechType.Affirmations);
+        var intersect = words.Intersect(text.Split(' ')).ToList();
+        return intersect.Count > 0;
     }
 
     public bool UserRequestOutgoingsSummary(string text)

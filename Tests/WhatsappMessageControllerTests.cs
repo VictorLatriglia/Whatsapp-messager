@@ -10,6 +10,8 @@ public class WhatsappMessageControllerTests
     Mock<ILoggerService> _loggerServiceMock;
     Mock<IUserInformationService> _userServiceMock;
     Mock<ISpeechRecognitionService> _speechServiceMock;
+    Mock<IUserOutgoingsService> _userOutgoingsService;
+    Mock<IUserConversationService> _userConvoService;
 
     public WhatsappMessageControllerTests()
     {
@@ -17,6 +19,8 @@ public class WhatsappMessageControllerTests
         _loggerServiceMock = new Mock<ILoggerService>();
         _userServiceMock = new Mock<IUserInformationService>();
         _speechServiceMock = new Mock<ISpeechRecognitionService>();
+        _userOutgoingsService = new Mock<IUserOutgoingsService>();
+        _userConvoService = new Mock<IUserConversationService>();
     }
 
     [Fact]
@@ -30,7 +34,9 @@ public class WhatsappMessageControllerTests
             _messageSenderMock.Object,
             _loggerServiceMock.Object,
             _userServiceMock.Object,
-            _speechServiceMock.Object);
+            _speechServiceMock.Object,
+            _userOutgoingsService.Object,
+            _userConvoService.Object);
         // When
         var res = await controller.SendMessage("This is a test", "12345");
 
@@ -87,10 +93,12 @@ public class WhatsappMessageControllerTests
         };
 
         WhatsappSenderController controller = new WhatsappSenderController(
-            _messageSenderMock.Object, 
-            _loggerServiceMock.Object, 
+            _messageSenderMock.Object,
+            _loggerServiceMock.Object,
             _userServiceMock.Object,
-            _speechServiceMock.Object);
+            _speechServiceMock.Object,
+            _userOutgoingsService.Object,
+            _userConvoService.Object);
         // When
         var res = await controller.MessageReceived(data);
 
@@ -121,10 +129,12 @@ public class WhatsappMessageControllerTests
         };
 
         WhatsappSenderController controller = new WhatsappSenderController(
-            _messageSenderMock.Object, 
-            _loggerServiceMock.Object, 
+            _messageSenderMock.Object,
+            _loggerServiceMock.Object,
             _userServiceMock.Object,
-            _speechServiceMock.Object);
+            _speechServiceMock.Object,
+            _userOutgoingsService.Object,
+            _userConvoService.Object);
         // When
         await Assert.ThrowsAsync(typeof(NullReferenceException), async () =>
         {

@@ -45,4 +45,11 @@ public class Repository<T> : IRepository<T> where T : class
     {
         return DataSet.AsQueryable();
     }
+
+    public async Task<T> UpdateAsync(T entity)
+    {
+        DataSet.Update(entity);
+        await Context.SaveChangesAsync();
+        return entity;
+    }
 }
