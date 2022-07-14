@@ -6,6 +6,7 @@ public class User : EntityBase
 {
     public string Name { get; set; }
     public string PhoneNumber { get; set; }
+    public bool AutoSaveOutgoings { get; set; }
 
     public static User Build(string Name, string PhoneNumber)
     {

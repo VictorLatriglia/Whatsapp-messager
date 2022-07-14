@@ -12,7 +12,7 @@ public class PlatanizatorService
     }
     public static string PlatanizeOutgoings(List<UserOutgoing> outgoings)
     {
-        StringBuilder builder = new StringBuilder("Hola!, este es el resumen de tus gastos hasta el momento:\n");
+        StringBuilder builder = new StringBuilder("Hola! este es el resumen de tus gastos hasta el momento:\n");
         var categories = outgoings
             .Select(x => x.Tag).Select(x => x.OutgoingsCategory)
             .Distinct().ToList();

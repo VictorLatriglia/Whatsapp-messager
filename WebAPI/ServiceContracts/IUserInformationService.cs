@@ -5,4 +5,5 @@ public interface IUserInformationService
 {
     Task<User> AddUser(string name, string userPhone);
     Task<User> GetUserAsync(string userPhone);
+    Task<User> ChangeUserAutoAcceptance(User user, bool autoAccept);
 }
