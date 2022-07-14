@@ -67,6 +67,36 @@ public class RepositoryTests
     }
 
     [Fact]
+    public async Task AsQueryable_Success()
+    {
+        // Given
+        Repository<Log> repo = new Repository<Log>(Context);
+
+        // When
+        var log = await repo.AddAsync(Log.Build("TEST", false, ActionType.InternalProcess));
+        var logs = repo.AsQueryable();
+        // Then
+        Assert.Contains(log, logs.ToList());
+    }
+
+    [Fact]
+    public async Task Update_Success()
+    {
+        // Given
+        Repository<Log> repo = new Repository<Log>(Context);
+
+        // When
+        var log = await repo.AddAsync(Log.Build("TEST", false, ActionType.InternalProcess));
+        var logs = await repo.GetAllAsync();
+        Assert.Contains(log, logs);
+        log.LogData = "MODIFIED";
+        await repo.UpdateAsync(log);
+        logs = await repo.GetAllAsync();
+        // Then
+        Assert.Equal("MODIFIED", log.LogData);
+    }
+
+    [Fact]
     public async Task Delete_Success()
     {
         // Given

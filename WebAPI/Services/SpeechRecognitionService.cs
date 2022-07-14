@@ -9,20 +9,36 @@ public class SpeechRecognitionService : ISpeechRecognitionService
     {
         _vaultService = vaultService;
     }
-    public bool TextContainsNumbers(string text)
+    public bool TextContainsNumbers(string text, out List<string> IdentifiedNumbers)
     {
-        throw new NotImplementedException();
+        List<string> TextParts = text.ToLower().Split(' ').ToList();
+        var Numbers = _vaultService.GetUserKeyWords(SpeechType.Numbers);
+        IdentifiedNumbers = new List<string>();
+        foreach (var part in TextParts)
+        {
+            foreach (var number in Numbers)
+            {
+                if (part.Contains(number))
+                {
+                    IdentifiedNumbers.Add(part);
+                    break;
+                }
+            }
+        }
+        return IdentifiedNumbers.Count > 0;
     }
 
     public bool UserGivesConfirmation(string text)
     {
-        throw new NotImplementedException();
+        var words = _vaultService.GetUserKeyWords(SpeechType.Affirmations);
+        var intersect = words.Intersect(text.ToLower().Split(' ')).ToList();
+        return intersect.Count > 0;
     }
 
     public bool UserRequestOutgoingsSummary(string text)
     {
         var words = _vaultService.GetUserKeyWords(SpeechType.SummaryRequest);
-        var intersect = words.Intersect(text.Split(' ')).ToList();
+        var intersect = words.Intersect(text.ToLower().Split(' ')).ToList();
         return intersect.Count > 0;
     }
 }

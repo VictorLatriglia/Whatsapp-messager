@@ -1,4 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Whatsapp_bot.Utils;
+[ExcludeFromCodeCoverage]
 public struct ManagedDateTime
 {
     private static DateTime now;

@@ -48,6 +48,8 @@ sealed class Program
         builder.Services.AddTransient<IUserInformationService, UserInformationService>();
         builder.Services.AddTransient<IWhatsappMessageSenderService, WhatsappMessageSenderService>();
         builder.Services.AddTransient<ISpeechRecognitionService, SpeechRecognitionService>();
+        builder.Services.AddTransient<IUserConversationService, UserConversationService>();
+        builder.Services.AddTransient<IUserOutgoingsService, UserOutgoingsService>();
 
         var app = builder.Build();
 

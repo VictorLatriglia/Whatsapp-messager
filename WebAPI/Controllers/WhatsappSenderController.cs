@@ -15,16 +15,22 @@ public class WhatsappSenderController : ControllerBase
     private readonly ILoggerService _loggerService;
     private readonly IUserInformationService _userService;
     private readonly ISpeechRecognitionService _speechRecognitionService;
+    private readonly IUserOutgoingsService _userOutgoingsService;
+    private readonly IUserConversationService _userConversationsService;
     public WhatsappSenderController(
         IWhatsappMessageSenderService whatsappMessageSenderService,
         ILoggerService loggerService,
         IUserInformationService userService,
-        ISpeechRecognitionService speechRecognitionService)
+        ISpeechRecognitionService speechRecognitionService,
+        IUserOutgoingsService userOutgoingsService,
+        IUserConversationService userConversationsService)
     {
         _whatsappMessageSenderService = whatsappMessageSenderService;
         _loggerService = loggerService;
         _userService = userService;
         _speechRecognitionService = speechRecognitionService;
+        _userOutgoingsService = userOutgoingsService;
+        _userConversationsService = userConversationsService;
     }
 
     [HttpPost("SendMessage")]
@@ -55,7 +61,7 @@ public class WhatsappSenderController : ControllerBase
 
             var userPhone = message.From;
             var user = await _userService.GetUserAsync(userPhone);
-            var text = message.text.body;
+            var text = message.text.body.ToLower();
             if (user == null)
             {
                 await _loggerService.SaveLog($"Numero de telefono {userPhone} no reconocido envió {text}", true, ActionType.MessageReceived);
@@ -65,17 +71,19 @@ public class WhatsappSenderController : ControllerBase
 
             if (_speechRecognitionService.UserRequestOutgoingsSummary(text.ToLower()))
             {
-                var outgoings = await _userService.GetOutgoingsSummary(user);
+                var outgoings = await _userOutgoingsService.GetOutgoingsSummary(user);
                 return await SendMessagePrivate(userPhone,
                     PlatanizatorService.PlatanizeOutgoings(outgoings));
             }
-            var recognicedParts = text.Split(' ');
-            if (recognicedParts != null && recognicedParts.Length == 3)
+            List<string> numbers;
+            var availableTags = await _userConversationsService.GetAvailableTags();
+            if (_speechRecognitionService.TextContainsNumbers(text, out numbers))
             {
-                var result = await _userService.AddOutgoing(Convert.ToDouble(recognicedParts[2]), recognicedParts[1], recognicedParts[0], user);
-                await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
-                return await SendMessagePrivate(userPhone,
-                    $"Gracias! hemos registrado tu gasto de ${recognicedParts[2]} en {recognicedParts[1]}");
+                return await HandleRequestWithNumbers(user, text, userPhone, numbers, availableTags);
+            }
+            if (await _userConversationsService.GetConversation(user) is Conversation convo)
+            {
+                return await HandleRequestWithPreviousConvo(user, text, userPhone, convo, availableTags);
             }
             else
             {
@@ -91,6 +99,65 @@ public class WhatsappSenderController : ControllerBase
         }
     }
 
+    private async Task<string> HandleRequestWithNumbers(User user, string text, string userPhone, List<string> numbers, IList<OutgoingsTag> availableTags)
+    {
+        List<string> TextParts = text.Split(' ').Except(numbers).ToList();
+        List<OutgoingsTag> Tags = availableTags.Where(x => TextParts.Contains(x.Name)).ToList();
+        OutgoingsTag matchedTag = Tags.FirstOrDefault();
+        double ammount = Convert.ToDouble(numbers.FirstOrDefault());
+        await _userConversationsService.CreateConversation(user, ammount, matchedTag?.Name ?? "");
+        if (matchedTag == null)
+        {
+            await _loggerService.SaveLog("Gasto por añadir, pendiente de tag", false, ActionType.MessageReceived);
+            return await SendMessagePrivate(userPhone,
+                $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} sin embargo no detectamos ningúna etiqueta para él.\n Por favor, escribenos el nombre de la etiqueta y nos encargaremos del resto. \nGracias!");
+        }
+        else
+        {
+            await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
+            return await SendMessagePrivate(userPhone,
+                $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} en {matchedTag.Name}.\n Está bien lo que vamos a agregar? Confirmanos que te entendimos bien y almacenaremos la información. \nGracias!");
+        }
+
+    }
+
+    private async Task<string> HandleRequestWithPreviousConvo(User user, string text, string userPhone, Conversation convo, IList<OutgoingsTag> availableTags)
+    {
+        if (string.IsNullOrEmpty(convo.TagName))
+        {
+            var matchedTag = availableTags.FirstOrDefault(x => x.Name.Equals(text));
+            convo = await _userConversationsService.UpdateConversationTag(user, text);
+            if (matchedTag != null)
+            {
+                convo = await _userConversationsService.UpdateConversationCategory(user, matchedTag.OutgoingsCategory.Name);
+                return await SendMessagePrivate(userPhone,
+                    $"Vale, creo que ya te entendemos, almacenamos entonces {convo.Ammount.ToString("C")} en {convo.TagName}?");
+            }
+            return await SendMessagePrivate(userPhone,
+                $"Vale, ya nos estamos entendiendo entonces, sin embargo no tenemos registrada la etiqueta: {convo.TagName}\nSobre qué categoría deberíamos almacenarla?");
+        }
+        if (string.IsNullOrEmpty(convo.CategoryName))
+        {
+            convo = await _userConversationsService.UpdateConversationCategory(user, text);
+            return await SendMessagePrivate(userPhone,
+                $"Vale, creo que ya te entendemos, almacenamos entonces {convo.Ammount.ToString("C")} en {convo.TagName}?\nSerá creada la etiqueta en la categoría {convo.CategoryName}, así podrás usarla en el futuro sin mayor problema");
+        }
+        if (_speechRecognitionService.UserGivesConfirmation(text))
+        {
+            await _userOutgoingsService.AddOutgoing(convo.Ammount, convo.TagName, convo.CategoryName, user);
+            await _userConversationsService.DeleteConversation(user);
+            await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
+            return await SendMessagePrivate(userPhone,
+                $"Listo! hemos registrado tu gasto de {convo.Ammount.ToString("C")} en {convo.TagName}");
+        }
+        else
+        {
+            await _userConversationsService.DeleteConversation(user);
+            return await SendMessagePrivate(userPhone,
+                $"Vale, acabamos de cancelar el registro, puedes agregar nuevos gastos a partir de ahora (o contactarnos si hubo algún problema en el proceso)");
+        }
+
+    }
     private async Task<string> SendMessagePrivate(string phoneNumber, string message)
     {
         return await _whatsappMessageSenderService.SendMessage(phoneNumber, message);
