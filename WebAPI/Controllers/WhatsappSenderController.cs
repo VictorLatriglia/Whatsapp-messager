@@ -75,6 +75,15 @@ public class WhatsappSenderController : ControllerBase
                 return await SendMessagePrivate(userPhone,
                     PlatanizatorService.PlatanizeOutgoings(outgoings));
             }
+            if (text.Contains("autoaceptar"))
+            {
+                bool autoAccept = true;
+                if (text.Contains("no"))
+                    autoAccept = false;
+                await _userService.ChangeUserAutoAcceptance(user, autoAccept);
+                return await SendMessagePrivate(userPhone,
+                $"Listo, hemos cambiado la autoaceptación. {(autoAccept ? "Ahora autoaceptaremos los registros sin solicitar una confirmación" : "A partir de ahora te solicitaremos una confirmación para añadir cada gasto")}");
+            }
             List<string> numbers;
             var availableTags = await _userConversationsService.GetAvailableTags();
             if (_speechRecognitionService.TextContainsNumbers(text, out numbers))
@@ -85,12 +94,9 @@ public class WhatsappSenderController : ControllerBase
             {
                 return await HandleRequestWithPreviousConvo(user, text, userPhone, convo, availableTags);
             }
-            else
-            {
-                await _loggerService.SaveLog("No se pudo añadir el gasto, la data no estuvo en el formato correcto", true, ActionType.MessageReceived);
-                return await SendMessagePrivate(userPhone,
-                    "Lo sentimos, no registraste el dato de manera correcta. \nRecuerda que debe ser en formato:\nCategoría Etiqueta Valor\nPor ejemplo:\nAlimentos café 5500");
-            }
+            await _loggerService.SaveLog("No se pudo añadir el gasto, la data no estuvo en el formato correcto", true, ActionType.MessageReceived);
+            return await SendMessagePrivate(userPhone,
+                "Lo sentimos, no registraste el dato de manera correcta. Necesitamos al menos un número para comenzar el proceso");
         }
         catch (Exception ex)
         {
@@ -105,20 +111,29 @@ public class WhatsappSenderController : ControllerBase
         List<OutgoingsTag> Tags = availableTags.Where(x => TextParts.Contains(x.Name)).ToList();
         OutgoingsTag matchedTag = Tags.FirstOrDefault();
         double ammount = Convert.ToDouble(numbers.FirstOrDefault());
-        await _userConversationsService.CreateConversation(user, ammount, matchedTag?.Name ?? "");
+        var convo = await _userConversationsService.CreateConversation(user, ammount, matchedTag?.Name ?? "");
         if (matchedTag == null)
         {
             await _loggerService.SaveLog("Gasto por añadir, pendiente de tag", false, ActionType.MessageReceived);
             return await SendMessagePrivate(userPhone,
                 $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} sin embargo no detectamos ningúna etiqueta para él.\n Por favor, escribenos el nombre de la etiqueta y nos encargaremos del resto. \nGracias!");
         }
-        else
+        if (user.AutoSaveOutgoings)
         {
-            await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
-            return await SendMessagePrivate(userPhone,
-                $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} en {matchedTag.Name}.\n Está bien lo que vamos a agregar? Confirmanos que te entendimos bien y almacenaremos la información. \nGracias!");
+            return await SaveOutgoing(user, userPhone, convo);
         }
 
+        return await SendMessagePrivate(userPhone,
+            $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} en {matchedTag.Name}.\n Está bien lo que vamos a agregar? Confirmanos que te entendimos bien y almacenaremos la información. \nGracias!");
+    }
+
+    private async Task<string> SaveOutgoing(User user, string userPhone, Conversation convo)
+    {
+        await _userOutgoingsService.AddOutgoing(convo.Ammount, convo.TagName, convo.CategoryName, user);
+        await _userConversationsService.DeleteConversation(user);
+        await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
+        return await SendMessagePrivate(userPhone,
+            $"Listo! hemos registrado tu gasto de {convo.Ammount.ToString("C")} en {convo.TagName}");
     }
 
     private async Task<string> HandleRequestWithPreviousConvo(User user, string text, string userPhone, Conversation convo, IList<OutgoingsTag> availableTags)
@@ -139,16 +154,16 @@ public class WhatsappSenderController : ControllerBase
         if (string.IsNullOrEmpty(convo.CategoryName))
         {
             convo = await _userConversationsService.UpdateConversationCategory(user, text);
+            if (user.AutoSaveOutgoings)
+            {
+                return await SaveOutgoing(user, userPhone, convo);
+            }
             return await SendMessagePrivate(userPhone,
                 $"Vale, creo que ya te entendemos, almacenamos entonces {convo.Ammount.ToString("C")} en {convo.TagName}?\nSerá creada la etiqueta en la categoría {convo.CategoryName}, así podrás usarla en el futuro sin mayor problema");
         }
         if (_speechRecognitionService.UserGivesConfirmation(text))
         {
-            await _userOutgoingsService.AddOutgoing(convo.Ammount, convo.TagName, convo.CategoryName, user);
-            await _userConversationsService.DeleteConversation(user);
-            await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
-            return await SendMessagePrivate(userPhone,
-                $"Listo! hemos registrado tu gasto de {convo.Ammount.ToString("C")} en {convo.TagName}");
+            return await SaveOutgoing(user, userPhone, convo);
         }
         else
         {
