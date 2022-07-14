@@ -21,8 +21,8 @@ public class UserOutgoingsService : IUserOutgoingsService
     }
     public async Task<UserOutgoing> AddOutgoing(double ammount, string tag, string category, User user)
     {
-        var savedTag = await _tagsRepo.GetAsync(x => x.Name.Equals(tag.ToUpper()));
-        var savedCategory = await _categoriesRepo.GetAsync(x => x.Name.Equals(category.ToUpper()));
+        var savedTag = await _tagsRepo.GetAsync(x => x.Name.Equals(tag.ToLower()));
+        var savedCategory = await _categoriesRepo.GetAsync(x => x.Name.Equals(category.ToLower()));
         if (savedTag == null && savedCategory == null)
         {
             savedCategory = await _categoriesRepo.AddAsync(OutgoingsCategory.Build(category));

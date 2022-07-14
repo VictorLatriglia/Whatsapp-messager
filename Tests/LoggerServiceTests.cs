@@ -16,8 +16,28 @@ public class LoggerServiceTests
 
         // When
         var res = await service.SaveLog("From Unit test", false, ActionType.InternalProcess);
-        
+
         // Then
         Assert.NotEqual("", res.Id);
+    }
+
+    [Fact]
+    public async Task GetAll_Success()
+    {
+        // Given
+        Mock<IRepository<Log>> moq = new Mock<IRepository<Log>>();
+        moq.Setup(x => x.GetAllAsync()).Returns(
+            Task.FromResult(
+                new List<Log>()
+                {
+                    new Log { Id = Guid.NewGuid().ToString() }
+                } as IList<Log>));
+        LoggerService service = new LoggerService(moq.Object);
+
+        // When
+        var res = await service.GetAll();
+
+        // Then
+        Assert.NotEmpty(res);
     }
 }

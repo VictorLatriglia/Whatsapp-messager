@@ -1,12 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Whatsapp_bot.ServiceContracts;
 
 namespace Whatsapp_bot.Utils.Middleware;
+[ExcludeFromCodeCoverage]
 public class MetaControlledResponseFilter : IResultFilter
 {
     public void OnResultExecuted(ResultExecutedContext context)
     {
+        //The Catching of the result will be executed on the previous method, although this method
+        //can not be ommited as per the IResultFilter interface
     }
 
     public void OnResultExecuting(ResultExecutingContext context)
@@ -14,6 +18,7 @@ public class MetaControlledResponseFilter : IResultFilter
         context.HttpContext.Response.StatusCode = StatusCodes.Status200OK;
     }
 }
+[ExcludeFromCodeCoverage]
 public class MetaExceptionFilter : IExceptionFilter
 {
     private readonly ILoggerService _loggerService;

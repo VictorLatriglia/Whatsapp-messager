@@ -1,4 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Whatsapp_bot.Models.EntityModels;
+[ExcludeFromCodeCoverage]
 public class Conversation : EntityBase
 {
     public string UserId { get; set; }

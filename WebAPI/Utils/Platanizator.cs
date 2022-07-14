@@ -1,9 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Whatsapp_bot.Models.EntityModels;
 
 namespace Whatsapp_bot.Utils;
+[ExcludeFromCodeCoverage]
 public class PlatanizatorService
 {
+    protected PlatanizatorService()
+    {
+
+    }
     public static string PlatanizeOutgoings(List<UserOutgoing> outgoings)
     {
         StringBuilder builder = new StringBuilder("Hola!, este es el resumen de tus gastos hasta el momento:\n");

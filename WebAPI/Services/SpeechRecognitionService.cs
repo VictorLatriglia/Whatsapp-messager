@@ -11,23 +11,34 @@ public class SpeechRecognitionService : ISpeechRecognitionService
     }
     public bool TextContainsNumbers(string text, out List<string> IdentifiedNumbers)
     {
-        List<string> TextParts = text.Split(' ').ToList();
+        List<string> TextParts = text.ToLower().Split(' ').ToList();
         var Numbers = _vaultService.GetUserKeyWords(SpeechType.Numbers);
-        IdentifiedNumbers = TextParts.Intersect(Numbers).ToList();
+        IdentifiedNumbers = new List<string>();
+        foreach (var part in TextParts)
+        {
+            foreach (var number in Numbers)
+            {
+                if (part.Contains(number))
+                {
+                    IdentifiedNumbers.Add(part);
+                    break;
+                }
+            }
+        }
         return IdentifiedNumbers.Count > 0;
     }
 
     public bool UserGivesConfirmation(string text)
     {
         var words = _vaultService.GetUserKeyWords(SpeechType.Affirmations);
-        var intersect = words.Intersect(text.Split(' ')).ToList();
+        var intersect = words.Intersect(text.ToLower().Split(' ')).ToList();
         return intersect.Count > 0;
     }
 
     public bool UserRequestOutgoingsSummary(string text)
     {
         var words = _vaultService.GetUserKeyWords(SpeechType.SummaryRequest);
-        var intersect = words.Intersect(text.Split(' ')).ToList();
+        var intersect = words.Intersect(text.ToLower().Split(' ')).ToList();
         return intersect.Count > 0;
     }
 }

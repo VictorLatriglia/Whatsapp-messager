@@ -8,23 +8,14 @@ public class UserConversationService : IUserConversationService
 {
     readonly IRepository<Conversation> _conversationsRepo;
     readonly IRepository<OutgoingsTag> _tagsRepo;
-    readonly IRepository<OutgoingsCategory> _categoriesRepo;
-    readonly IRepository<UserOutgoing> _outgoingsRepo;
-    readonly IUserInformationService _userInformationService;
 
     public UserConversationService(
         IRepository<Conversation> conversationsRepo,
-        IRepository<OutgoingsTag> tagsRepo,
-        IRepository<OutgoingsCategory> categoriesRepo,
-        IRepository<UserOutgoing> outgoingsRepo,
-        IUserInformationService userInformationService
+        IRepository<OutgoingsTag> tagsRepo
     )
     {
         _conversationsRepo = conversationsRepo;
         _tagsRepo = tagsRepo;
-        _categoriesRepo = categoriesRepo;
-        _outgoingsRepo = outgoingsRepo;
-        _userInformationService = userInformationService;
     }
     public async Task<Conversation> CreateConversation(User user, double ammount, string tag = "")
     {
