@@ -82,7 +82,7 @@ public class WhatsappSenderController : ControllerBase
                     autoAccept = false;
                 await _userService.ChangeUserAutoAcceptance(user, autoAccept);
                 return await SendMessagePrivate(userPhone,
-                $"Listo, hemos cambiado la autoaceptación. {(autoAccept ? "Ahora autoaceptaremos los registros sin solicitar una confirmación" : "A partir de ahora te solicitaremos una confirmación para añadir cada gasto")}");
+                $"Listo, hemos cambiado la autoaceptación. {(autoAccept ? "Ahora guardaremos automáticamente los registros sin solicitar una confirmación" : "A partir de ahora te solicitaremos una confirmación para añadir cada gasto")}");
             }
             List<string> numbers;
             var availableTags = await _userConversationsService.GetAvailableTags();
@@ -96,7 +96,7 @@ public class WhatsappSenderController : ControllerBase
             }
             await _loggerService.SaveLog("No se pudo añadir el gasto, la data no estuvo en el formato correcto", true, ActionType.MessageReceived);
             return await SendMessagePrivate(userPhone,
-                "Lo sentimos, no registraste el dato de manera correcta. Necesitamos al menos un número para comenzar el proceso");
+                "Lo sentimos, no registraste el dato de manera correcta. Necesitamos al menos el valor del gasto para comenzar el proceso");
         }
         catch (Exception ex)
         {
