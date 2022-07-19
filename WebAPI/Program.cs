@@ -69,7 +69,7 @@ namespace Whatsapp_bot
                 app.UseSwaggerUI();
             }
             app.UseHangfireDashboard();
-            RecurringJob.AddOrUpdate<IBackgroundAutoRemember>(x => x.SendMessagesToUsers(), "0 0 */4 * * * *");
+            RecurringJob.AddOrUpdate<IBackgroundAutoRemember>(x => x.SendMessagesToUsers(), "0 0 */4 * * *");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
