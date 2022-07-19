@@ -359,3 +359,4 @@ WebAPI/Properties
 WebAPI/Coverage.xml
 
 WebAPI/MyDatabase.db
+WebAPI/Hangfire.db
