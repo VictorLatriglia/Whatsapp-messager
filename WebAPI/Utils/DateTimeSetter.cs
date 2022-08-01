@@ -9,10 +9,7 @@ public struct ManagedDateTime
     {
         get
         {
-            if (now == default)
-            {
-                now = DateTime.UtcNow;
-            }
+            now = DateTime.UtcNow;
             return now.AddHours(-5);
         }
         set
