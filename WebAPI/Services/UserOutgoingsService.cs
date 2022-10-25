@@ -6,41 +6,38 @@ using Whatsapp_bot.ServiceContracts;
 namespace Whatsapp_bot.Services;
 public class UserOutgoingsService : IUserOutgoingsService
 {
-    readonly IRepository<UserOutgoing> _userOutgoingRepo;
+    readonly IRepository<MoneyMovement> _userOutgoingRepo;
     readonly IRepository<OutgoingsCategory> _categoriesRepo;
-    readonly IRepository<OutgoingsTag> _tagsRepo;
 
     public UserOutgoingsService(
-        IRepository<UserOutgoing> userOutgoingRepo,
-        IRepository<OutgoingsCategory> categoriesRepo,
-        IRepository<OutgoingsTag> tagsRepo)
+        IRepository<MoneyMovement> userOutgoingRepo,
+        IRepository<OutgoingsCategory> categoriesRepo)
     {
         _userOutgoingRepo = userOutgoingRepo;
         _categoriesRepo = categoriesRepo;
-        _tagsRepo = tagsRepo;
     }
-    public async Task<UserOutgoing> AddOutgoing(double ammount, string tag, string category, User user)
+    public async Task<MoneyMovement> AddOutgoing(double ammount, string tag, string category, User user)
     {
-        var savedTag = await _tagsRepo.GetAsync(x => x.Name.Equals(tag.ToLower()));
         var savedCategory = await _categoriesRepo.GetAsync(x => x.Name.Equals(category.ToLower()));
-        if (savedTag == null && savedCategory == null)
-        {
-            savedCategory = await _categoriesRepo.AddAsync(OutgoingsCategory.Build(category));
-            savedTag = await _tagsRepo.AddAsync(OutgoingsTag.Build(tag, savedCategory.Id));
-        }
-        if (savedTag == null)
-        {
-            savedTag = await _tagsRepo.AddAsync(OutgoingsTag.Build(tag, savedCategory.Id));
-        }
-        return await _userOutgoingRepo.AddAsync(UserOutgoing.Build(ammount, savedTag.Id, user.Id));
+        return await _userOutgoingRepo.AddAsync(MoneyMovement.Build(ammount, tag, user.Id, savedCategory.Id));
     }
 
-    public async Task<List<UserOutgoing>> GetOutgoingsSummary(User user)
+    public async Task<List<MoneyMovement>> GetOutgoingsSummary(User user)
     {
         var userOutgoings = await _userOutgoingRepo.AsQueryable()
-            .Include(x => x.Tag).ThenInclude(x => x.OutgoingsCategory)
+            .Include(x => x.Category)
             .Where(x => x.UserId.Equals(user.Id))
             .ToListAsync();
         return userOutgoings;
+    }
+
+    public async Task<OutgoingsCategory> GetCategoryBasedOnPreviousTag(string text)
+    {
+        var category = (await _userOutgoingRepo.AsQueryable()
+            .Include(x => x.Category)
+            .Where(x => x.Tag.Contains(text))
+            .Select(x => x.Category)
+            .ToListAsync())?.FirstOrDefault()??null;
+        return category;
     }
 }

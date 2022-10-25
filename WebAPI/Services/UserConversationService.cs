@@ -7,25 +7,22 @@ namespace Whatsapp_bot.Services;
 public class UserConversationService : IUserConversationService
 {
     readonly IRepository<Conversation> _conversationsRepo;
-    readonly IRepository<OutgoingsTag> _tagsRepo;
+    readonly IRepository<OutgoingsCategory> _categoriesRepo;
 
     public UserConversationService(
         IRepository<Conversation> conversationsRepo,
-        IRepository<OutgoingsTag> tagsRepo
-    )
+        IRepository<OutgoingsCategory> categoriesRepo)
     {
         _conversationsRepo = conversationsRepo;
-        _tagsRepo = tagsRepo;
+        _categoriesRepo = categoriesRepo;
     }
+
+    public async Task<IList<string>> GetAvailableCategories() =>
+       await _categoriesRepo.AsQueryable().Select(x => x.Name).Take(10).ToListAsync();
+
     public async Task<Conversation> CreateConversation(User user, double ammount, string tag = "")
     {
-        OutgoingsTag tagStored = null;
-        if (!string.IsNullOrEmpty(tag))
-        {
-            tagStored = await _tagsRepo.AsQueryable().Include(x => x.OutgoingsCategory)
-                .FirstOrDefaultAsync(x => x.Name.Equals(tag));
-        }
-        Conversation convo = Conversation.Build(user.Id, tagStored?.Name ?? "", tagStored?.OutgoingsCategory.Name ?? "", ammount);
+        Conversation convo = Conversation.Build(user.Id, tag, "", ammount);
         return await _conversationsRepo.AddAsync(convo);
     }
 
@@ -35,9 +32,6 @@ public class UserConversationService : IUserConversationService
         if (convo != null)
             await _conversationsRepo.DeleteAsync(convo);
     }
-
-    public async Task<IList<OutgoingsTag>> GetAvailableTags() =>
-        await _tagsRepo.GetAllAsync();
 
     public async Task<Conversation> GetConversation(User user) =>
         await _conversationsRepo.GetAsync(x => x.UserId.Equals(user.Id));

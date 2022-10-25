@@ -10,13 +10,13 @@ namespace Whatsapp_bot.Utils.Middleware
     public class BackgroundAutoRemember : IBackgroundAutoRemember
     {
         readonly IHttpService<SendMessageTemplateModel, string> _httpService;
-        readonly IRepository<UserOutgoing> _userOutgoingRepo;
+        readonly IRepository<MoneyMovement> _userOutgoingRepo;
         readonly IRepository<User> _usersRepo;
         readonly IVaultInformationService _vaultInformationService;
 
         public BackgroundAutoRemember(
             IHttpService<SendMessageTemplateModel, string> httpService,
-            IRepository<UserOutgoing> userOutgoingRepo,
+            IRepository<MoneyMovement> userOutgoingRepo,
             IRepository<User> usersRepo,
             IVaultInformationService vaultInformationService)
         {

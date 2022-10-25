@@ -7,6 +7,5 @@ public interface IUserConversationService
     Task<Conversation> UpdateConversationCategory(User user, string category);
     Task<Conversation> GetConversation(User user);
     Task DeleteConversation(User user);
-
-    Task<IList<OutgoingsTag>> GetAvailableTags();
+    Task<IList<string>> GetAvailableCategories();
 }

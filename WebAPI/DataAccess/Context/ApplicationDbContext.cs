@@ -6,9 +6,8 @@ public class ApplicationDbContext : DbContext, IDbContext
 {
     public DbSet<Log> Logs { get; set; }
     public DbSet<OutgoingsCategory> OutgoingsCategories { get; set; }
-    public DbSet<OutgoingsTag> OutgoingsTags { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<UserOutgoing> UserOutgoings { get; set; }
+    public DbSet<MoneyMovement> UserOutgoings { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> opts) : base(opts)

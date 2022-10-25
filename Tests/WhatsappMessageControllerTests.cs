@@ -122,21 +122,16 @@ public class WhatsappMessageControllerTests
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(true);
         _userOutgoingsService.Setup(x => x.GetOutgoingsSummary(It.IsAny<User>()))
-            .Returns(Task.FromResult(new List<UserOutgoing>
+            .Returns(Task.FromResult(new List<MoneyMovement>
             {
-                new UserOutgoing{
+                new MoneyMovement{
                     Ammount = 1111,
-                    TagId = "TestTag",
-                    Tag = new OutgoingsTag
+                    Tag = "TestTag",
+                    CategoryId = "TestCategory",
+                    Category =  new OutgoingsCategory
                     {
-                        Id = "TestTag",
-                        Name = "Test Tag",
-                        OutgoingsCategoryId = "TestCategory",
-                        OutgoingsCategory = new OutgoingsCategory
-                        {
-                            Id = "TestCategory",
-                            Name = "Test category"
-                        }
+                        Id = "TestCategory",
+                        Name = "Test category"
                     }
                 }
             }));
@@ -158,19 +153,21 @@ public class WhatsappMessageControllerTests
 
 
     [Fact]
-    public async Task MessageReceived_UserTextContainsNumbers_NotMatchedTag_Success()
+    public async Task MessageReceived_UserTextContainsNumbers_NotMatchedCategory_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<WhatsappListTemplate>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
+        _userConvoService.Setup(x => x.GetAvailableCategories()).Returns(Task.FromResult(new List<string> { "Test category" } as IList<string>));
+
+
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test" } } as IList<OutgoingsTag>));
         ModifyBaseDataText("NonAplicable 3000");
         WhatsappSenderController controller = new WhatsappSenderController(
             _messageSenderMock.Object,
@@ -187,7 +184,7 @@ public class WhatsappMessageControllerTests
         Assert.Equal("OK", res);
     }
     [Fact]
-    public async Task MessageReceived_UserTextContainsNumbers_WithMatchedTag_Success()
+    public async Task MessageReceived_UserTextContainsNumbers_WithMatchedCategory_Success()
     {
         // Given
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
@@ -195,11 +192,13 @@ public class WhatsappMessageControllerTests
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
+        _userConvoService.Setup(x => x.GetAvailableCategories()).Returns(Task.FromResult(new List<string> { "Test" } as IList<string>));
+        _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(),It.IsAny<string>())).Returns(Task.FromResult(new Conversation()));
+        _userOutgoingsService.Setup(x => x.GetCategoryBasedOnPreviousTag(It.IsAny<string>())).Returns(Task.FromResult(new OutgoingsCategory { Name = "Test" }));
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test" } } as IList<OutgoingsTag>));
         ModifyBaseDataText("Test 3000");
         WhatsappSenderController controller = new WhatsappSenderController(
             _messageSenderMock.Object,
@@ -229,7 +228,6 @@ public class WhatsappMessageControllerTests
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test", OutgoingsCategory = new OutgoingsCategory { Name = "TestCategory" } } } as IList<OutgoingsTag>));
         _userConvoService.Setup(x => x.GetConversation(It.IsAny<User>())).Returns(Task.FromResult(new Conversation { Ammount = 1111 }));
         _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(new Conversation { Ammount = 1111 }));
         ModifyBaseDataText("Test");
@@ -261,7 +259,6 @@ public class WhatsappMessageControllerTests
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test", OutgoingsCategory = new OutgoingsCategory { Name = "TestCategory" } } } as IList<OutgoingsTag>));
         _userConvoService.Setup(x => x.GetConversation(It.IsAny<User>())).Returns(Task.FromResult(new Conversation { Ammount = 1111, TagName = "test" }));
         _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(new Conversation { Ammount = 1111 }));
         ModifyBaseDataText("NonApplicable");
@@ -294,7 +291,6 @@ public class WhatsappMessageControllerTests
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Affirmations)).Returns(new List<string> { "yes" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test", OutgoingsCategory = new OutgoingsCategory { Name = "TestCategory" } } } as IList<OutgoingsTag>));
         _userConvoService.Setup(x => x.GetConversation(It.IsAny<User>())).Returns(Task.FromResult(new Conversation { Ammount = 1111, TagName = "test", CategoryName = "TestCategory" }));
         _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(new Conversation { Ammount = 1111 }));
         ModifyBaseDataText("yes");
@@ -327,7 +323,6 @@ public class WhatsappMessageControllerTests
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.SummaryRequest)).Returns(new List<string> { "summary" });
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Affirmations)).Returns(new List<string> { "yes" });
         SpeechRecognitionService speechService = new SpeechRecognitionService(vaultMock.Object);
-        _userConvoService.Setup(x => x.GetAvailableTags()).Returns(Task.FromResult(new List<OutgoingsTag> { new OutgoingsTag { Name = "test", OutgoingsCategory = new OutgoingsCategory { Name = "TestCategory" } } } as IList<OutgoingsTag>));
         _userConvoService.Setup(x => x.GetConversation(It.IsAny<User>())).Returns(Task.FromResult(new Conversation { Ammount = 1111, TagName = "test", CategoryName = "TestCategory" }));
         _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(new Conversation { Ammount = 1111 }));
         ModifyBaseDataText("no");
