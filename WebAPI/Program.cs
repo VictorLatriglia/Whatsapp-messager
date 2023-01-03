@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Whatsapp_bot.DataAccess.Context;
 using Whatsapp_bot.DataAccess.Repository;
 using Whatsapp_bot.ServiceContracts;
@@ -9,6 +10,7 @@ using Whatsapp_bot.Utils.Middleware;
 using Hangfire;
 using Hangfire.Server;
 using Hangfire.Storage.SQLite;
+using Whatsapp_bot.Utils;
 
 namespace Whatsapp_bot
 {
@@ -42,17 +44,16 @@ namespace Whatsapp_bot
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
             builder.Services.AddScoped<MetaControlledResponseFilter>();
-            builder.Services.AddSqlite<ApplicationDbContext>("Filename=MyDatabase.db");
-            builder.Services.AddHangfire(configuration => configuration
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSQLiteStorage("Hangfire.db", new SQLiteStorageOptions() { AutoVacuumSelected = SQLiteStorageOptions.AutoVacuum.FULL, JobExpirationCheckInterval = TimeSpan.FromSeconds(30) }));
-            builder.Services.AddHangfireServer();
+            builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
+            builder.Services.AddSqlServer<ApplicationDbContext>(Environment.GetEnvironmentVariable(Globals.SQL_CONNECTION_STRG));
+            //builder.Services.AddHangfire(configuration => configuration
+            //    .UseSimpleAssemblyNameTypeSerializer()
+            //    .UseRecommendedSerializerSettings());
+            //builder.Services.AddHangfireServer();
             builder.Services.AddScoped<DbContext, ApplicationDbContext>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IHttpService<,>), typeof(HttpService<,>));
             builder.Services.AddTransient<ILoggerService, LoggerService>();
-            builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
             builder.Services.AddTransient<IUserInformationService, UserInformationService>();
             builder.Services.AddTransient<IWhatsappMessageSenderService, WhatsappMessageSenderService>();
             builder.Services.AddTransient<ISpeechRecognitionService, SpeechRecognitionService>();
@@ -68,8 +69,8 @@ namespace Whatsapp_bot
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseHangfireDashboard();
-            RecurringJob.AddOrUpdate<IBackgroundAutoRemember>(x => x.SendMessagesToUsers(), "0 0 */4 * * *");
+            //app.UseHangfireDashboard();
+            //RecurringJob.AddOrUpdate<IBackgroundAutoRemember>(x => x.SendMessagesToUsers(), "0 0 */4 * * *");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
