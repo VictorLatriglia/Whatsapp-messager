@@ -116,10 +116,11 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserRequestSummary_Success()
     {
         // Given
+        var categoryId = Guid.NewGuid();
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(true);
         _userOutgoingsService.Setup(x => x.GetOutgoingsSummary(It.IsAny<User>()))
             .Returns(Task.FromResult(new List<MoneyMovement>
@@ -127,10 +128,10 @@ public class WhatsappMessageControllerTests
                 new MoneyMovement{
                     Ammount = 1111,
                     Tag = "TestTag",
-                    CategoryId = "TestCategory",
+                    CategoryId = categoryId,
                     Category =  new OutgoingsCategory
                     {
-                        Id = "TestCategory",
+                        Id = categoryId,
                         Name = "Test category"
                     }
                 }
@@ -159,7 +160,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<WhatsappListTemplate>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         _userConvoService.Setup(x => x.GetAvailableCategories()).Returns(Task.FromResult(new List<string> { "Test category" } as IList<string>));
 
@@ -190,7 +191,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         _userConvoService.Setup(x => x.GetAvailableCategories()).Returns(Task.FromResult(new List<string> { "Test" } as IList<string>));
         _userConvoService.Setup(x => x.UpdateConversationCategory(It.IsAny<User>(),It.IsAny<string>())).Returns(Task.FromResult(new Conversation()));
@@ -222,7 +223,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
@@ -253,7 +254,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
@@ -284,7 +285,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });
@@ -316,7 +317,7 @@ public class WhatsappMessageControllerTests
         _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
-            .Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         _speechServiceMock.Setup(x => x.UserRequestOutgoingsSummary(It.IsAny<string>())).Returns(false);
         Mock<IVaultInformationService> vaultMock = new Mock<IVaultInformationService>();
         vaultMock.Setup(x => x.GetUserKeyWords(SpeechType.Numbers)).Returns(new List<string> { "3" });

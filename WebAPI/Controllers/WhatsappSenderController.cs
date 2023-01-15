@@ -34,6 +34,13 @@ public class WhatsappSenderController : ControllerBase
         _userConversationsService = userConversationsService;
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddCategory(string categoryName)
+    {
+        await _userOutgoingsService.AddCategory(categoryName);
+        return Ok();
+    }
+
     [HttpPost("SendMessage")]
     public async Task<string> SendMessage(string message, string phoneNumber)
     {
@@ -123,7 +130,7 @@ public class WhatsappSenderController : ControllerBase
         var category = await _userOutgoingsService.GetCategoryBasedOnPreviousTag(TextParts[0]);
         double ammount = Convert.ToDouble(numbers.FirstOrDefault());
         var convo = await _userConversationsService.CreateConversation(user, ammount, TextParts[0]);
-        if (category == null)
+        if (category == null || string.IsNullOrEmpty(category.Name))
         {
             var modelData = new WhatsappListTemplate(
                 userPhone, "Categoría",

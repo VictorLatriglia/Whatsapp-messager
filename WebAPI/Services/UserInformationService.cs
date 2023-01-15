@@ -21,6 +21,10 @@ public class UserInformationService : IUserInformationService
     {
         return await _userRepo.GetAsync(x => x.PhoneNumber.Equals(userPhone));
     }
+    public async Task<User> GetUserAsync(Guid userId)
+    {
+        return await _userRepo.GetAsync(x => x.Id.Equals(userId));
+    }
     public async Task<User> ChangeUserAutoAcceptance(User user, bool autoAccept)
     {
         user.AutoSaveOutgoings = autoAccept;

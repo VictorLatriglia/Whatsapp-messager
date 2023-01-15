@@ -12,11 +12,11 @@ public class UserInformationServiceTests
     {
         // Given
         Mock<IRepository<User>> userRepoMock = new Mock<IRepository<User>>();
-        userRepoMock.Setup(x => x.AddAsync(It.IsAny<User>())).Returns(Task.FromResult(new User { Id = Guid.NewGuid().ToString() }));
+        userRepoMock.Setup(x => x.AddAsync(It.IsAny<User>())).Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
         UserInformationService userService = new UserInformationService(userRepoMock.Object);
         // When
         var res = await userService.AddUser("Test", "1234567890");
         // Then
-        Assert.NotEqual("", res.Id);
+        Assert.NotEqual(Guid.Empty, res.Id);
     }
 }

@@ -14,15 +14,15 @@ public class UserOutgoingsServiceTests
         Mock<IRepository<MoneyMovement>> userOutgoingRepoMock = new Mock<IRepository<MoneyMovement>>();
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
         categoriesRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsCategory, bool>>>()))
-            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid() }));
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
-                    .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid().ToString() }));
+                    .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
 
         UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
-        Assert.NotEqual("", res.Id);
+        Assert.NotEqual(Guid.Empty, res.Id);
     }
 
     [Fact]
@@ -33,15 +33,15 @@ public class UserOutgoingsServiceTests
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
 
         categoriesRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsCategory, bool>>>()))
-            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString() }));
+            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid() }));
 
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
-                .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid().ToString() }));
+                .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
         UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
-        Assert.NotEqual("", res.Id);
+        Assert.NotEqual(Guid.Empty, res.Id);
     }
 
     [Fact]
@@ -52,13 +52,13 @@ public class UserOutgoingsServiceTests
         Mock<IRepository<OutgoingsCategory>> categoriesRepoMock = new Mock<IRepository<OutgoingsCategory>>();
 
         categoriesRepoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<OutgoingsCategory, bool>>>()))
-            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid().ToString(), Name = "TEST" }));
+            .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid(), Name = "TEST" }));
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
-                .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid().ToString() }));
+                .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
         UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
         // When
-        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid().ToString() });
+        var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
-        Assert.NotEqual("", res.Id);
+        Assert.NotEqual(Guid.Empty, res.Id);
     }
 }

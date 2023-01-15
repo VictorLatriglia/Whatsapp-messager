@@ -18,7 +18,7 @@ public class LoggerServiceTests
         var res = await service.SaveLog("From Unit test", false, ActionType.InternalProcess);
 
         // Then
-        Assert.NotEqual("", res.Id);
+        Assert.NotEqual(Guid.Empty, res.Id);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class LoggerServiceTests
             Task.FromResult(
                 new List<Log>()
                 {
-                    new Log { Id = Guid.NewGuid().ToString() }
+                    new Log { Id = Guid.NewGuid() }
                 } as IList<Log>));
         LoggerService service = new LoggerService(moq.Object);
 

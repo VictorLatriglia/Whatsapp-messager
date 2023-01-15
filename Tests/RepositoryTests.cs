@@ -24,7 +24,7 @@ public class RepositoryTests
         var log = await repo.AddAsync(Log.Build("TEST", false, ActionType.InternalProcess));
 
         // Then
-        Assert.NotEqual("", log.Id);
+        Assert.NotEqual(Guid.Empty, log.Id);
     }
 
     [Fact]

@@ -13,12 +13,12 @@ public class UserConversationServiceTests
     {
         Mock<IRepository<Conversation>> convoMock = new Mock<IRepository<Conversation>>();
         Mock<IRepository<OutgoingsCategory>> categoryMock = new Mock<IRepository<OutgoingsCategory>>();
-        convoMock.Setup(x => x.AddAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
+        convoMock.Setup(x => x.AddAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
         // Given
         UserConversationService service = new UserConversationService(convoMock.Object, categoryMock.Object);
 
         // When
-        var res = await service.CreateConversation(new User { Id = Guid.NewGuid().ToString() }, 1);
+        var res = await service.CreateConversation(new User { Id = Guid.NewGuid() }, 1);
         // Then
         Assert.NotNull(res);
     }
@@ -27,7 +27,7 @@ public class UserConversationServiceTests
     public async Task CreateConversation_WithCategory_Success()
     {
         Mock<IRepository<Conversation>> convoMock = new Mock<IRepository<Conversation>>();
-        convoMock.Setup(x => x.AddAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
+        convoMock.Setup(x => x.AddAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName: "MyTestDatabase")
             .Options;
@@ -38,7 +38,7 @@ public class UserConversationServiceTests
         UserConversationService service = new UserConversationService(convoMock.Object, categoryRepo);
 
         // When
-        var res = await service.CreateConversation(new User { Id = Guid.NewGuid().ToString() }, 1, "TEST");
+        var res = await service.CreateConversation(new User { Id = Guid.NewGuid() }, 1, "TEST");
         // Then
         Assert.NotNull(res);
     }
@@ -50,12 +50,12 @@ public class UserConversationServiceTests
     {
         Mock<IRepository<Conversation>> convoMock = new Mock<IRepository<Conversation>>();
         Mock<IRepository<OutgoingsCategory>> categoryMock = new Mock<IRepository<OutgoingsCategory>>();
-        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
+        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
         // Given
         UserConversationService service = new UserConversationService(convoMock.Object, categoryMock.Object);
 
         // When
-        var res = await service.GetConversation(new User { Id = Guid.NewGuid().ToString() });
+        var res = await service.GetConversation(new User { Id = Guid.NewGuid() });
         // Then
         Assert.NotNull(res);
     }
@@ -65,13 +65,13 @@ public class UserConversationServiceTests
     {
         Mock<IRepository<Conversation>> convoMock = new Mock<IRepository<Conversation>>();
         Mock<IRepository<OutgoingsCategory>> categoryMock = new Mock<IRepository<OutgoingsCategory>>();
-        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
-        convoMock.Setup(x => x.UpdateAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
+        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
+        convoMock.Setup(x => x.UpdateAsync(It.IsAny<Conversation>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
         // Given
         UserConversationService service = new UserConversationService(convoMock.Object, categoryMock.Object);
 
         // When
-        var res = await service.UpdateConversationCategory(new User { Id = Guid.NewGuid().ToString() }, "TEST");
+        var res = await service.UpdateConversationCategory(new User { Id = Guid.NewGuid() }, "TEST");
         // Then
         Assert.NotNull(res);
     }
@@ -81,13 +81,13 @@ public class UserConversationServiceTests
     {
         Mock<IRepository<Conversation>> convoMock = new Mock<IRepository<Conversation>>();
         Mock<IRepository<OutgoingsCategory>> categoryMock = new Mock<IRepository<OutgoingsCategory>>();
-        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid().ToString() }));
+        convoMock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Conversation, bool>>>())).Returns(Task.FromResult(new Conversation { Id = Guid.NewGuid() }));
         convoMock.Setup(x => x.DeleteAsync(It.IsAny<Conversation>())).Returns(Task.CompletedTask);
         // Given
         UserConversationService service = new UserConversationService(convoMock.Object, categoryMock.Object);
 
         // When
-        Task completeDeletion = service.DeleteConversation(new User { Id = Guid.NewGuid().ToString() });
+        Task completeDeletion = service.DeleteConversation(new User { Id = Guid.NewGuid() });
         await completeDeletion;
         // Then
         Assert.Equal(Task.CompletedTask, completeDeletion);
