@@ -42,7 +42,7 @@ namespace Whatsapp_bot
             });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
+            builder.Services.AddMemoryCache();
             builder.Services.AddScoped<MetaControlledResponseFilter>();
             builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
             builder.Services.AddSqlServer<ApplicationDbContext>(Environment.GetEnvironmentVariable(Globals.SQL_CONNECTION_STRG));
@@ -51,6 +51,7 @@ namespace Whatsapp_bot
             //    .UseRecommendedSerializerSettings());
             //builder.Services.AddHangfireServer();
             builder.Services.AddScoped<DbContext, ApplicationDbContext>();
+            builder.Services.AddSingleton<ILogInService, LogInService>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IHttpService<,>), typeof(HttpService<,>));
             builder.Services.AddTransient<ILoggerService, LoggerService>();

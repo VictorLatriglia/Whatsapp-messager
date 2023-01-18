@@ -12,32 +12,59 @@ namespace Whatsapp_bot.Controllers
     public class MoneyMovementController : Controller
     {
         private readonly IUserOutgoingsService _userOutgoingsService;
+        private readonly ILoggerService _loggerService;
 
         public MoneyMovementController(
-        IUserOutgoingsService userOutgoingsService)
+        IUserOutgoingsService userOutgoingsService,
+        ILoggerService loggerService)
         {
             _userOutgoingsService = userOutgoingsService;
+            _loggerService = loggerService;
         }
 
         [HttpGet("Get")]
         public async Task<IActionResult> GetMovements([FromHeader(Name = "X-User-Key")] Guid userId, DateTime beginDate, DateTime? endDate)
         {
-            var results = await _userOutgoingsService.GetOutgoingsSummary(userId, beginDate, endDate);
-            return Ok(new MoneyMovementResult(results));
+            try
+            {
+                var results = await _userOutgoingsService.GetOutgoingsSummary(userId, beginDate, endDate);
+                return Ok(new MoneyMovementResult(results));
+            }
+            catch (Exception ex)
+            {
+                await _loggerService.SaveLog(ex.ToString(),true,ActionType.InternalProcess);
+                return StatusCode(500);
+            }
         }
 
         [HttpPut("Update")]
         public async Task<IActionResult> EditMovement([FromHeader(Name = "X-User-Key")] Guid userId, [FromBody] MoneyMovement data)
         {
-            await _userOutgoingsService.UpdateMovement(userId, data);
-            return Ok();
+            try
+            {
+                await _userOutgoingsService.UpdateMovement(userId, data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await _loggerService.SaveLog(ex.ToString(), true, ActionType.InternalProcess);
+                return StatusCode(500);
+            }
         }
 
         [HttpDelete("Delete")]
         public async Task<IActionResult> DeleteMovement([FromQuery] Guid moneyMovementId)
         {
-            await _userOutgoingsService.DeleteMovement(moneyMovementId);
-            return Ok();
+            try
+            {
+                await _userOutgoingsService.DeleteMovement(moneyMovementId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await _loggerService.SaveLog(ex.ToString(), true, ActionType.InternalProcess);
+                return StatusCode(500);
+            }
         }
     }
 }
