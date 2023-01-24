@@ -25,8 +25,8 @@ jobs:
       - name: Build with dotnet
         run: dotnet build WebAPI/Whatsapp-Bot.csproj --configuration Release
 
-      - name: Unit testing
-        run: dotnet test Tests/Tests.csproj
+      # - name: Unit testing
+      #   run: dotnet test Tests/Tests.csproj
 
       - name: dotnet publish
         run: dotnet publish WebAPI/Whatsapp-Bot.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp

@@ -60,7 +60,7 @@ namespace Whatsapp_bot.Controllers
             if (!otpValid)
                 return Unauthorized();
 
-            return Ok();
+            return Ok(user.Id);
         }
     }
 }

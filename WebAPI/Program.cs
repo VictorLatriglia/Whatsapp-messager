@@ -70,6 +70,7 @@ namespace Whatsapp_bot
             app.UseCors(pol =>
             {
                 pol.AllowAnyOrigin();
+                pol.AllowAnyHeader();
             });
 
             app.UseHttpsRedirection();
