@@ -46,10 +46,6 @@ namespace Whatsapp_bot
             builder.Services.AddScoped<MetaControlledResponseFilter>();
             builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
             builder.Services.AddSqlServer<ApplicationDbContext>(Environment.GetEnvironmentVariable(Globals.SQL_CONNECTION_STRG));
-            //builder.Services.AddHangfire(configuration => configuration
-            //    .UseSimpleAssemblyNameTypeSerializer()
-            //    .UseRecommendedSerializerSettings());
-            //builder.Services.AddHangfireServer();
             builder.Services.AddScoped<DbContext, ApplicationDbContext>();
             builder.Services.AddSingleton<ILogInService, LogInService>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -70,8 +66,12 @@ namespace Whatsapp_bot
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            //app.UseHangfireDashboard();
-            //RecurringJob.AddOrUpdate<IBackgroundAutoRemember>(x => x.SendMessagesToUsers(), "0 0 */4 * * *");
+
+            app.UseCors(pol =>
+            {
+                pol.AllowAnyOrigin();
+            });
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

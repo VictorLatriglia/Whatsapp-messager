@@ -23,6 +23,7 @@ namespace Whatsapp_bot.Controllers
         }
 
         [HttpGet("Get")]
+        [ProducesResponseType(typeof(MoneyMovementResult),200)]
         public async Task<IActionResult> GetMovements([FromHeader(Name = "X-User-Key")] Guid userId, DateTime beginDate, DateTime? endDate)
         {
             try
