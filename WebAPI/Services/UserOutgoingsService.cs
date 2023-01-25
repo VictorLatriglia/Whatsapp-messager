@@ -40,7 +40,7 @@ public class UserOutgoingsService : IUserOutgoingsService
     {
         var userOutgoings = await _userOutgoingRepo.AsQueryable()
             .Include(x => x.Category)
-            .Where(x => x.UserId.Equals(userId.ToString())).Where(x => x.CreatedOn >= beginDate && (endDate == null || x.CreatedOn <= endDate))
+            .Where(x => x.UserId.Equals(userId)).Where(x => x.CreatedOn >= beginDate && (endDate == null || x.CreatedOn <= endDate))
             .ToListAsync();
         return userOutgoings;
     }
