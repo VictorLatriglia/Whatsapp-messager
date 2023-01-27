@@ -8,20 +8,23 @@ public class UserOutgoingsService : IUserOutgoingsService
 {
     readonly IRepository<MoneyMovement> _userOutgoingRepo;
     readonly IRepository<OutgoingsCategory> _categoriesRepo;
-    readonly IRepository<User> _userRepo;
+    
     public UserOutgoingsService(
         IRepository<MoneyMovement> userOutgoingRepo,
-        IRepository<OutgoingsCategory> categoriesRepo,
-        IRepository<User> userRepo)
+        IRepository<OutgoingsCategory> categoriesRepo)
     {
         _userOutgoingRepo = userOutgoingRepo;
         _categoriesRepo = categoriesRepo;
-        _userRepo = userRepo;
     }
 
     public async Task AddCategory(string categoryName)
     {
         await _categoriesRepo.AddAsync(OutgoingsCategory.Build(categoryName));
+    }
+
+    public async Task<IList<OutgoingsCategory>> GetAvailableCategories()
+    {
+        return await _categoriesRepo.GetAllAsync();
     }
 
     public async Task<MoneyMovement> AddOutgoing(double ammount, string tag, string category, User user)

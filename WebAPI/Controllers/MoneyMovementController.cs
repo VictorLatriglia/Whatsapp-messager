@@ -29,7 +29,8 @@ namespace Whatsapp_bot.Controllers
             try
             {
                 var results = await _userOutgoingsService.GetOutgoingsSummary(userId, beginDate, endDate);
-                return Ok(new MoneyMovementResult(results));
+                var categories = await _userOutgoingsService.GetAvailableCategories();
+                return Ok(new MoneyMovementResult(results, categories));
             }
             catch (Exception ex)
             {
