@@ -71,6 +71,7 @@ namespace Whatsapp_bot
             {
                 pol.AllowAnyOrigin();
                 pol.AllowAnyHeader();
+                pol.AllowAnyMethod();
             });
 
             app.UseHttpsRedirection();
