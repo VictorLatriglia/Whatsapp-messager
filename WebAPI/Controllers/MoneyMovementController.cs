@@ -39,11 +39,11 @@ namespace Whatsapp_bot.Controllers
         }
 
         [HttpPut("Update")]
-        public async Task<IActionResult> EditMovement([FromHeader(Name = "X-User-Key")] Guid userId, [FromBody] MoneyMovement data)
+        public async Task<IActionResult> EditMovement([FromHeader(Name = "X-User-Key")] Guid userId, [FromBody] MoneyMovementUpdate data)
         {
             try
             {
-                await _userOutgoingsService.UpdateMovement(userId, data);
+                await _userOutgoingsService.UpdateMovement(userId, data.BuildEntityDBO());
                 return Ok();
             }
             catch (Exception ex)

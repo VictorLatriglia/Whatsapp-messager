@@ -8,12 +8,15 @@ public class UserOutgoingsService : IUserOutgoingsService
 {
     readonly IRepository<MoneyMovement> _userOutgoingRepo;
     readonly IRepository<OutgoingsCategory> _categoriesRepo;
+    readonly IRepository<User> _userRepo;
     public UserOutgoingsService(
         IRepository<MoneyMovement> userOutgoingRepo,
-        IRepository<OutgoingsCategory> categoriesRepo)
+        IRepository<OutgoingsCategory> categoriesRepo,
+        IRepository<User> userRepo)
     {
         _userOutgoingRepo = userOutgoingRepo;
         _categoriesRepo = categoriesRepo;
+        _userRepo = userRepo;
     }
 
     public async Task AddCategory(string categoryName)
@@ -57,8 +60,14 @@ public class UserOutgoingsService : IUserOutgoingsService
 
     public async Task UpdateMovement(Guid userId, MoneyMovement data)
     {
-        data.UserId = userId;
-        await _userOutgoingRepo.UpdateAsync(data);
+        var currentData = await _userOutgoingRepo.GetAsync(x => x.Id == data.Id);
+
+        currentData.CategoryId = data.CategoryId;
+        currentData.Ammount = data.Ammount;
+        currentData.CreatedOn = data.CreatedOn;
+        currentData.Tag = data.Tag;
+
+        await _userOutgoingRepo.UpdateAsync(currentData);
     }
 
     public async Task DeleteMovement(Guid movementId)
