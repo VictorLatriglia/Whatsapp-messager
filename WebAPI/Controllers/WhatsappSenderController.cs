@@ -71,7 +71,7 @@ public class WhatsappSenderController : ControllerBase
 
             var user = await _userService.GetUserAsync(userPhone);
 
-            var text = message.IsReply ? message.interactive.list_reply.title.ToLower() : message.text.body.ToLower();
+            var text = message.IsReply ? message.interactive?.list_reply.title.ToLower() ?? "" : message.text?.body.ToLower() ?? "";
 
             if (user == null)
             {
