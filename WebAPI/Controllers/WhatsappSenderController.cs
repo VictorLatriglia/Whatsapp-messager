@@ -80,9 +80,9 @@ public class WhatsappSenderController : ControllerBase
                 "Lo sentimos, no estás registrado en la plataforma todavía");
             }
 
-            if(message.image != null)
+            if (message.image != null)
             {
-                await _userOutgoingsService.AddImage(message.image.id,user.Id);
+                await _userOutgoingsService.AddImage(message.image.id, user.Id, message.id);
                 return await SendMessagePrivate(userPhone,
                     "Hemos recibido tu factura, la procesaremos y te avisaremos cuando esté registrada en el sistema");
             }
@@ -131,47 +131,74 @@ public class WhatsappSenderController : ControllerBase
         }
     }
 
-    private async Task<string> HandleRequestWithNumbers(User user, string text, string userPhone, List<string> numbers)
+    [HttpPost("InvoiceProcessed")]
+    public async Task<string> InvoiceProcessed(InvoiceProcessedModel data)
+    {
+        var user = await _userService.GetUserAsync(data.UserId);
+        var userPhone = user.PhoneNumber;
+        if (data.CategoryId != null)
+        {
+            return await HandleRequestWithNumbers(user, data.Tag, userPhone, new List<string>() { data.Ammount.ToString() }, data.CategoryId, true, data.MessageToReply);
+        }
+
+        await _userConversationsService.CreateConversation(user, data.Ammount);
+        return await SendMessagePrivate(userPhone,
+                $"Lo sentimos, tuvimos un problema al intentar entender de qué era tu factura, identificamos un valor de ${data.Ammount}, envíanos por favor (en una palabra) de qué se trata esta factura", data.MessageToReply);
+    }
+
+    private async Task<string> HandleRequestWithNumbers(User user, string text, string userPhone, List<string> numbers, Guid? CategoryId = null, bool forceSaveOutgoing = false, string replyToMessageId = "")
     {
         List<string> TextParts = text.Split(' ').Except(numbers).ToList();
-        var category = await _userOutgoingsService.GetCategoryBasedOnPreviousTag(TextParts[0]);
+        var category = CategoryId != null ? await _userOutgoingsService.GetCategoryById(CategoryId) : await _userOutgoingsService.GetCategoryBasedOnPreviousTag(TextParts[0]);
         double ammount = Convert.ToDouble(numbers.FirstOrDefault());
         var convo = await _userConversationsService.CreateConversation(user, ammount, TextParts[0]);
         if (category == null || string.IsNullOrEmpty(category.Name))
         {
-            var modelData = new WhatsappListTemplate(
-                userPhone, "Categoría",
-                $"Vale, Sobre qué categoría deberíamos almacenar esto?",
-                "Ver categorías",
-                "Categorías disponibles: ",
-                await _userConversationsService.GetAvailableCategories());
-            await _loggerService.SaveLog("Enviando info de categorias: " + JsonConvert.SerializeObject(modelData), false, ActionType.InternalProcess);
-            return await _whatsappMessageSenderService.SendMessage(modelData);
+            return await RequestCategory(userPhone);
         }
         else
         {
             await _userConversationsService.UpdateConversationCategory(user, category.Name);
         }
-        if (user.AutoSaveOutgoings)
+        if (user.AutoSaveOutgoings || forceSaveOutgoing)
         {
-            return await SaveOutgoing(user, userPhone, convo);
+            return await SaveOutgoing(user, userPhone, convo, replyToMessageId);
         }
 
         return await SendMessagePrivate(userPhone,
             $"Hola! Recibimos tu solicitud de registro por {ammount.ToString("C")} en {category.Name}.\n Está bien lo que vamos a agregar? Confirmanos que te entendimos bien y almacenaremos la información. \nGracias!");
     }
 
-    private async Task<string> SaveOutgoing(User user, string userPhone, Conversation convo)
+    private async Task<string> SaveOutgoing(User user, string userPhone, Conversation convo, string replyToMessageId = "")
     {
         await _userOutgoingsService.AddOutgoing(convo.Ammount, convo.TagName, convo.CategoryName, user);
         await _userConversationsService.DeleteConversation(user);
         await _loggerService.SaveLog("Gasto añadido", false, ActionType.MessageReceived);
         return await SendMessagePrivate(userPhone,
-            $"Listo! hemos registrado tu gasto de {convo.Ammount.ToString("C")} en {convo.TagName}");
+            $"Listo! hemos registrado tu gasto de {convo.Ammount.ToString("C")} en {convo.TagName}", replyToMessageId);
+    }
+
+    private async Task<string> RequestCategory(string userPhone)
+    {
+        var modelData = new WhatsappListTemplate(
+                userPhone, "Categoría",
+                $"Vale, Sobre qué categoría deberíamos almacenar esto?",
+                "Ver categorías",
+                "Categorías disponibles: ",
+                await _userConversationsService.GetAvailableCategories());
+        await _loggerService.SaveLog("Enviando info de categorias: " + JsonConvert.SerializeObject(modelData), false, ActionType.InternalProcess);
+        return await _whatsappMessageSenderService.SendMessage(modelData);
     }
 
     private async Task<string> HandleRequestWithPreviousConvo(User user, string text, string userPhone, Conversation convo)
     {
+
+        if (string.IsNullOrEmpty(convo.TagName))
+        {
+            await _userConversationsService.UpdateConversationTag(user, text);
+            return await RequestCategory(user.PhoneNumber);
+        }
+
         if (string.IsNullOrEmpty(convo.CategoryName))
         {
             convo = await _userConversationsService.UpdateConversationCategory(user, text);
@@ -195,8 +222,8 @@ public class WhatsappSenderController : ControllerBase
         }
 
     }
-    private async Task<string> SendMessagePrivate(string phoneNumber, string message)
+    private async Task<string> SendMessagePrivate(string phoneNumber, string message, string replyToMessageId = "")
     {
-        return await _whatsappMessageSenderService.SendMessage(phoneNumber, message);
+        return await _whatsappMessageSenderService.SendMessage(phoneNumber, message, replyToMessageId);
     }
 }

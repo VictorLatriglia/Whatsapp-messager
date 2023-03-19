@@ -9,7 +9,7 @@ public class UserOutgoingsService : IUserOutgoingsService
     readonly IRepository<MoneyMovement> _userOutgoingRepo;
     readonly IRepository<OutgoingsCategory> _categoriesRepo;
     readonly IRepository<Image> _imageRepo;
-    
+
     public UserOutgoingsService(
         IRepository<MoneyMovement> userOutgoingRepo,
         IRepository<OutgoingsCategory> categoriesRepo,
@@ -20,9 +20,9 @@ public class UserOutgoingsService : IUserOutgoingsService
         _imageRepo = imageRepo;
     }
 
-    public async Task AddImage(string imageId, Guid UserId)
+    public async Task AddImage(string imageId, Guid UserId, string messageToReplyId)
     {
-        await _imageRepo.AddAsync(Image.Build(imageId, UserId));
+        await _imageRepo.AddAsync(Image.Build(imageId, UserId, messageToReplyId));
     }
 
     public async Task AddCategory(string categoryName)
@@ -86,5 +86,10 @@ public class UserOutgoingsService : IUserOutgoingsService
         var data = await _userOutgoingRepo.GetAsync(x => x.Id == movementId);
         if (data != null)
             await _userOutgoingRepo.DeleteAsync(data);
+    }
+
+    public async Task<OutgoingsCategory> GetCategoryById(Guid? categoryId)
+    {
+        return await _categoriesRepo.GetAsync(x => x.Id == categoryId);
     }
 }

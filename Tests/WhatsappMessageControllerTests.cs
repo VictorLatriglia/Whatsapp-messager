@@ -73,7 +73,7 @@ public class WhatsappMessageControllerTests
     public async Task SendMessage_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
         WhatsappSenderController controller = new WhatsappSenderController(
@@ -94,7 +94,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserNotRecogniced_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(),It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
 
@@ -117,7 +117,7 @@ public class WhatsappMessageControllerTests
     {
         // Given
         var categoryId = Guid.NewGuid();
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -188,7 +188,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserTextContainsNumbers_WithMatchedCategory_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -220,7 +220,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserTextWithoutNumbers_WithExistingTag_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -251,7 +251,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserTextWithoutNumbers_WithouthExistingTag_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -282,7 +282,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserTextWithoutNumbers_GivingConfirmation_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -314,7 +314,7 @@ public class WhatsappMessageControllerTests
     public async Task MessageReceived_UserTextWithoutNumbers_DoesNotGiveConfirmation_Success()
     {
         // Given
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
         _userServiceMock.Setup(x => x.GetUserAsync(It.IsAny<string>()))
             .Returns(Task.FromResult(new User { Id = Guid.NewGuid() }));
@@ -350,7 +350,7 @@ public class WhatsappMessageControllerTests
         _loggerServiceMock.Setup(x => x.SaveLog(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<ActionType>()))
             .Returns(Task.FromResult(Log.Build("This is a test", true, ActionType.InternalProcess)));
 
-        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>()))
+        _messageSenderMock.Setup(x => x.SendMessage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult("OK"));
 
         //Object left incomplete on purpose

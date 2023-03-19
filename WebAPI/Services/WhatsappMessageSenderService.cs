@@ -18,9 +18,9 @@ public class WhatsappMessageSenderService : IWhatsappMessageSenderService
         HttpListService = httpListService;
         VaultInformationService = vaultInformationService;
     }
-    public async Task<string> SendMessage(string phoneNumber, string message)
+    public async Task<string> SendMessage(string phoneNumber, string message, string replyToMessageId = "")
     {
-        var objectData = new SendMessageModel(phoneNumber, message);
+        var objectData = new SendMessageModel(phoneNumber, message, replyToMessageId);
 
         var baseUrl = VaultInformationService.GetParameter(Globals.WHATSAPP_BASE_URL);
         var phoneId = VaultInformationService.GetParameter(Globals.WHATSAPP_PHONE_ID);

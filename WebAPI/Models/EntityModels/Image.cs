@@ -6,12 +6,15 @@
 
         public Guid UserId { get; set; }
 
-        public static Image Build(string ImgId, Guid UserId)
+        public string MessageToReplyId { get; set; }
+
+        public static Image Build(string ImgId, Guid UserId, string messageToReplyId)
         {
             return new Image
             {
                 ImgId = ImgId,
-                UserId = UserId
+                UserId = UserId,
+                MessageToReplyId = messageToReplyId
             };
         }
     }

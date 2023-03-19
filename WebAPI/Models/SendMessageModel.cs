@@ -1,4 +1,6 @@
 namespace Whatsapp_bot.Models;
+
+using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
 [ExcludeFromCodeCoverage]
@@ -9,11 +11,21 @@ public class SendMessageModel
     public string to { get; set; }
     public readonly string type = "text";
     public readonly WhatsappTextModel text;
-    public SendMessageModel(string to, string body)
+
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public WhatsappContextModel? context { get; set; }
+    public SendMessageModel(string to, string body, string replyToId = "")
     {
         this.to = to;
         this.text = new WhatsappTextModel(body);
+        if(!string.IsNullOrEmpty(replyToId))
+            context = new WhatsappContextModel { message_id = replyToId };
     }
+}
+
+public class WhatsappContextModel
+{
+    public string message_id { get; set; }
 }
 
 public class WhatsappTextModel
