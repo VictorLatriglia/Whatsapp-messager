@@ -57,10 +57,19 @@ public class WhatsappSenderController : ControllerBase
     [HttpPost("MessageReceived")]
     [ServiceFilter(typeof(MetaControlledResponseFilter))]
     [TypeFilter(typeof(MetaExceptionFilter))]
-    public async Task<string> MessageReceived(WhatsappMessagesData data)
+    public async Task<string> MessageReceived()
     {
         try
         {
+
+            string body;
+            using (StreamReader reader = new StreamReader(Request.Body))
+            {
+                body = await reader.ReadToEndAsync();
+            }
+            await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "MOSTRANDO BODY PARA DEPURAR: \n" + body + "\n\n");
+
+            var data = JsonConvert.DeserializeObject<WhatsappMessagesData>(body);
             var firstEntry = data.Entry[0];
 
             var firstChange = firstEntry.Changes[0];
