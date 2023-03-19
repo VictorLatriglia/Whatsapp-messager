@@ -8,6 +8,7 @@ public interface IUserOutgoingsService
     Task<List<MoneyMovement>> GetOutgoingsSummary(User user);
     Task<List<MoneyMovement>> GetOutgoingsSummary(Guid userId, DateTime beginDate, DateTime? endDate);
     Task<OutgoingsCategory> GetCategoryBasedOnPreviousTag(string text);
+    Task<IList<OutgoingsCategory>> GetAvailableCategories();
     Task UpdateMovement(Guid userId, MoneyMovement data);
     Task DeleteMovement(Guid movementId);
 }

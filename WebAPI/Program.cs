@@ -45,7 +45,7 @@ namespace Whatsapp_bot
             builder.Services.AddMemoryCache();
             builder.Services.AddScoped<MetaControlledResponseFilter>();
             builder.Services.AddTransient<IVaultInformationService, VaultInformationService>();
-            builder.Services.AddSqlServer<ApplicationDbContext>(Environment.GetEnvironmentVariable(Globals.SQL_CONNECTION_STRG));
+            builder.Services.AddSqlServer<ApplicationDbContext>(Environment.GetEnvironmentVariable(Globals.SQL_CONNECTION_STRG), opts => opts.EnableRetryOnFailure());
             builder.Services.AddScoped<DbContext, ApplicationDbContext>();
             builder.Services.AddSingleton<ILogInService, LogInService>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -71,6 +71,7 @@ namespace Whatsapp_bot
             {
                 pol.AllowAnyOrigin();
                 pol.AllowAnyHeader();
+                pol.AllowAnyMethod();
             });
 
             app.UseHttpsRedirection();

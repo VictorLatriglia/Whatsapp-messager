@@ -29,7 +29,8 @@ namespace Whatsapp_bot.Controllers
             try
             {
                 var results = await _userOutgoingsService.GetOutgoingsSummary(userId, beginDate, endDate);
-                return Ok(new MoneyMovementResult(results));
+                var categories = await _userOutgoingsService.GetAvailableCategories();
+                return Ok(new MoneyMovementResult(results, categories));
             }
             catch (Exception ex)
             {
@@ -39,11 +40,11 @@ namespace Whatsapp_bot.Controllers
         }
 
         [HttpPut("Update")]
-        public async Task<IActionResult> EditMovement([FromHeader(Name = "X-User-Key")] Guid userId, [FromBody] MoneyMovement data)
+        public async Task<IActionResult> EditMovement([FromHeader(Name = "X-User-Key")] Guid userId, [FromBody] MoneyMovementUpdate data)
         {
             try
             {
-                await _userOutgoingsService.UpdateMovement(userId, data);
+                await _userOutgoingsService.UpdateMovement(userId, data.BuildEntityDBO());
                 return Ok();
             }
             catch (Exception ex)

@@ -4,11 +4,13 @@ namespace Whatsapp_bot.Models
 {
     public class MoneyMovementResult
     {
-        public MoneyMovementResult(List<MoneyMovement> movements)
+        public MoneyMovementResult(List<MoneyMovement> movements, IList<OutgoingsCategory> categories)
         {
             Data = BuildData(movements);
+            Categories = categories;
         }
 
+        public IList<OutgoingsCategory> Categories { get; set; }
         public List<ResultCategoryInformation> Data { get; set; }
 
         private List<ResultCategoryInformation> BuildData(List<MoneyMovement> _movements)
