@@ -89,7 +89,10 @@ public class WhatsappSenderController : ControllerBase
 
             if (_speechRecognitionService.UserRequestOutgoingsSummary(text.ToLower()))
             {
-                var outgoings = await _userOutgoingsService.GetOutgoingsSummary(user);
+                var now = DateTime.Now;
+                DateTime beginDate = new DateTime(now.Year, now.Month, 1);
+                DateTime endDate = new DateTime(now.Year, now.Month + 1, 1).AddDays(-1);
+                var outgoings = await _userOutgoingsService.GetOutgoingsSummary(user.Id, beginDate, endDate);
                 return await SendMessagePrivate(userPhone,
                     PlatanizatorService.PlatanizeOutgoings(outgoings));
             }
