@@ -60,9 +60,19 @@ public class MessagesData
     public string timestamp { get; set; }
     public TextData? text { get; set; }
     public InteractiveReplyData? interactive { get; set; }
+    public ImgData? image { get;set; }
+
     public string type { get; set; }
 
     public bool IsReply { get => interactive != null; }
+}
+
+[ExcludeFromCodeCoverage]
+public class ImgData
+{
+    public string mime_type { get; set; }
+    public string sha256 { get; set; }
+    public string id { get; set; }
 }
 
 [ExcludeFromCodeCoverage]

@@ -8,13 +8,21 @@ public class UserOutgoingsService : IUserOutgoingsService
 {
     readonly IRepository<MoneyMovement> _userOutgoingRepo;
     readonly IRepository<OutgoingsCategory> _categoriesRepo;
+    readonly IRepository<Image> _imageRepo;
     
     public UserOutgoingsService(
         IRepository<MoneyMovement> userOutgoingRepo,
-        IRepository<OutgoingsCategory> categoriesRepo)
+        IRepository<OutgoingsCategory> categoriesRepo,
+        IRepository<Image> imageRepo)
     {
         _userOutgoingRepo = userOutgoingRepo;
         _categoriesRepo = categoriesRepo;
+        _imageRepo = imageRepo;
+    }
+
+    public async Task AddImage(string imageId, Guid UserId)
+    {
+        await _imageRepo.AddAsync(Image.Build(imageId, UserId));
     }
 
     public async Task AddCategory(string categoryName)

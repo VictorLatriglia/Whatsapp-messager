@@ -57,19 +57,10 @@ public class WhatsappSenderController : ControllerBase
     [HttpPost("MessageReceived")]
     [ServiceFilter(typeof(MetaControlledResponseFilter))]
     [TypeFilter(typeof(MetaExceptionFilter))]
-    public async Task<string> MessageReceived()
+    public async Task<string> MessageReceived(WhatsappMessagesData data)
     {
         try
         {
-
-            string body;
-            using (StreamReader reader = new StreamReader(Request.Body))
-            {
-                body = await reader.ReadToEndAsync();
-            }
-            await SendMessagePrivate(Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER"), "MOSTRANDO BODY PARA DEPURAR: \n" + body + "\n\n");
-
-            var data = JsonConvert.DeserializeObject<WhatsappMessagesData>(body);
             var firstEntry = data.Entry[0];
 
             var firstChange = firstEntry.Changes[0];
@@ -87,6 +78,13 @@ public class WhatsappSenderController : ControllerBase
                 await _loggerService.SaveLog($"Numero de telefono {userPhone} no reconocido envió {text}", true, ActionType.MessageReceived);
                 return await SendMessagePrivate(userPhone,
                 "Lo sentimos, no estás registrado en la plataforma todavía");
+            }
+
+            if(message.image != null)
+            {
+                await _userOutgoingsService.AddImage(message.image.id,user.Id);
+                return await SendMessagePrivate(userPhone,
+                    "Hemos recibido tu factura, la procesaremos y te avisaremos cuando esté registrada en el sistema");
             }
 
             if (_speechRecognitionService.UserRequestOutgoingsSummary(text.ToLower()))

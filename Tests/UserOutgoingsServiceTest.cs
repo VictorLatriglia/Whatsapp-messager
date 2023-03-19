@@ -17,8 +17,8 @@ public class UserOutgoingsServiceTests
             .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid() }));
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
                     .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
-
-        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
+        Mock<IRepository<Image>> imageRepoMock = new Mock<IRepository<Image>>();
+        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object, imageRepoMock.Object);
         // When
         var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
@@ -37,7 +37,8 @@ public class UserOutgoingsServiceTests
 
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
                 .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
-        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
+        Mock<IRepository<Image>> imageRepoMock = new Mock<IRepository<Image>>();
+        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object, imageRepoMock.Object);
         // When
         var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
@@ -55,7 +56,8 @@ public class UserOutgoingsServiceTests
             .Returns(Task.FromResult(new OutgoingsCategory { Id = Guid.NewGuid(), Name = "TEST" }));
         userOutgoingRepoMock.Setup(x => x.AddAsync(It.IsAny<MoneyMovement>()))
                 .Returns(Task.FromResult(new MoneyMovement { Id = Guid.NewGuid() }));
-        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object);
+        Mock<IRepository<Image>> imageRepoMock = new Mock<IRepository<Image>>();
+        UserOutgoingsService userService = new UserOutgoingsService(userOutgoingRepoMock.Object, categoriesRepoMock.Object, imageRepoMock.Object);
         // When
         var res = await userService.AddOutgoing(1111, "TEST", "TEST", new User { Id = Guid.NewGuid() });
         // Then
