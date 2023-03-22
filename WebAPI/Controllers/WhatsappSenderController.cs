@@ -5,6 +5,7 @@ using Whatsapp_bot.Models.EntityModels;
 using Whatsapp_bot.Utils.Middleware;
 using Whatsapp_bot.Utils;
 using Newtonsoft.Json;
+using Azure.Messaging.ServiceBus;
 
 namespace Whatsapp_bot.Controllers;
 
@@ -83,8 +84,16 @@ public class WhatsappSenderController : ControllerBase
             if (message.image != null)
             {
                 var image = await _userOutgoingsService.AddImage(message.image.id, user.Id, message.id);
-                using (HttpClient client = new HttpClient())
-                    client.GetAsync(Environment.GetEnvironmentVariable("FunctionURL") + image.Id.ToString());
+                
+                ;
+                var clientOptions = new ServiceBusClientOptions()
+                {
+                    TransportType = ServiceBusTransportType.AmqpWebSockets
+                };
+                ServiceBusClient client = new ServiceBusClient(Environment.GetEnvironmentVariable("ASBEndpoint"), clientOptions);
+                ServiceBusSender sender = client.CreateSender(Environment.GetEnvironmentVariable("ASBQueue"));
+                await sender.SendMessageAsync(new ServiceBusMessage(image.Id.ToString()));
+
                 return await SendMessagePrivate(userPhone,
                     "Hemos recibido tu factura, la procesaremos y te avisaremos cuando esté registrada en el sistema");
             }
