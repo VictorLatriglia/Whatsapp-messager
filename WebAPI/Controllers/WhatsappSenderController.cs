@@ -82,7 +82,9 @@ public class WhatsappSenderController : ControllerBase
 
             if (message.image != null)
             {
-                await _userOutgoingsService.AddImage(message.image.id, user.Id, message.id);
+                var image = await _userOutgoingsService.AddImage(message.image.id, user.Id, message.id);
+                using (HttpClient client = new HttpClient())
+                    client.GetAsync(Environment.GetEnvironmentVariable("FunctionURL") + image.Id.ToString());
                 return await SendMessagePrivate(userPhone,
                     "Hemos recibido tu factura, la procesaremos y te avisaremos cuando esté registrada en el sistema");
             }

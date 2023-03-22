@@ -20,9 +20,9 @@ public class UserOutgoingsService : IUserOutgoingsService
         _imageRepo = imageRepo;
     }
 
-    public async Task AddImage(string imageId, Guid UserId, string messageToReplyId)
+    public async Task<Image> AddImage(string imageId, Guid UserId, string messageToReplyId)
     {
-        await _imageRepo.AddAsync(Image.Build(imageId, UserId, messageToReplyId));
+        return await _imageRepo.AddAsync(Image.Build(imageId, UserId, messageToReplyId));
     }
 
     public async Task AddCategory(string categoryName)
