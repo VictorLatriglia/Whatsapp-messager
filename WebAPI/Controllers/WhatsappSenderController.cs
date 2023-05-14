@@ -210,7 +210,9 @@ public class WhatsappSenderController : ControllerBase
         if (string.IsNullOrEmpty(convo.TagName))
         {
             await _userConversationsService.UpdateConversationTag(user, text);
-            return await RequestCategory(user.PhoneNumber);
+            var category = await _userOutgoingsService.GetCategoryBasedOnPreviousTag(text);
+            if(category == null)
+                return await RequestCategory(user.PhoneNumber);
         }
 
         if (string.IsNullOrEmpty(convo.CategoryName))
