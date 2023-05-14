@@ -213,6 +213,7 @@ public class WhatsappSenderController : ControllerBase
             var category = await _userOutgoingsService.GetCategoryBasedOnPreviousTag(text);
             if(category == null)
                 return await RequestCategory(user.PhoneNumber);
+            text = category.Name;
         }
 
         if (string.IsNullOrEmpty(convo.CategoryName))
